@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'FrankfurterCom';
+  src: url('./assets/font/FrankfurterStdRegular/FrankfurterStdRegular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+.font-frankfurter {
+  font-family: 'FrankfurterCom', sans-serif;
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  src: url('./assets/font/Quicksand/Quicksand-VariableFont_wght.ttf') format('truetype');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-quicksand {
+  font-family: 'Quicksand', sans-serif;
+}
+
+@font-face {
+  font-family: 'Quicksand';
+  src: url('./assets/font/Quicksand/Quicksand-Bold.ttf') format('truetype');
+  font-weight: 300 700;
+}
+
+.font-quicksand-bold {
+  font-family: 'Quicksand', sans-serif;
+}
+
+@font-face {
+  font-family: 'Futura';
+  src: url('./assets/font/Futura/SFUFuturaLight.TTF') format('truetype');
+  font-weight: 300 700;
+}
+
+.font-futura-light {
+  font-family: 'Futura', sans-serif;
+}
+
+@font-face {
+  font-family: 'Futura';
+  src: url('./assets/font/Futura/SFUFuturaRegular.TTF') format('truetype');
+  font-weight: 300 700;
+}
+
+.font-futura-regular {
+  font-family: 'Futura', sans-serif;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  /* Firefox */
+}
