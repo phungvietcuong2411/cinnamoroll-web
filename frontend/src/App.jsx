@@ -6,6 +6,9 @@ import Product from "./page/Guest/Product"
 import Detail from "./page/Guest/Detail"
 import Cart from "./page/Guest/Cart"
 import Follow from "./page/Guest/Follow"
+import Order from "./page/Guest/Order"
+import Checkout from "./page/Guest/Checkout"
+import Setting from "./page/Guest/Setting"
 // import Support from "./page/Guest/Support"
 // import Sale from "./page/Guest/Sale"
 // import Cart from "./page/User/Cart"
@@ -25,9 +28,9 @@ function App() {
         <Route path="/product" element={<Product />} />
         <Route path="/product/detail/:id" element={<Detail />} />
         <Route path="/follows" element={<Follow />} />
-        {/* <Route path="/support" element={<Support />} /> */}
-        {/* <Route path="/sale" element={<Sale />} /> */}
-
+        <Route path="/order" element={<Order />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/setting" element={<Setting />} />
         {/* User */}
         <Route path="/cart" element={<Cart />} />
         {/* <Route path="/follows" element={<Follows />} /> */}

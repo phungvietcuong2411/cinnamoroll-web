@@ -8,7 +8,8 @@ import {
   LogIn,
   ChevronDown,
   ChevronUp,
-  Settings
+  Settings,
+  Truck
 } from "lucide-react"
 
 
@@ -86,6 +87,12 @@ function Header() {
                     className="flex items-center gap-2 hover:text-blue-700"
                   >
                     <ShoppingCart size={16} /> Cart
+                  </Link>
+                  <Link
+                    to="/order"
+                    className="flex items-center gap-2 hover:text-blue-700"
+                  >
+                    <Truck size={16} /> Order
                   </Link>
                   <Link
                     to="/setting"
@@ -183,6 +190,12 @@ function Header() {
                   className="flex items-center gap-2 hover:text-blue-700"
                 >
                   <ShoppingCart size={18} /> Cart
+                </Link>
+                <Link
+                  to="/order"
+                  className="flex items-center gap-2 hover:text-blue-700"
+                >
+                  <Truck size={16} /> Order
                 </Link>
                 <Link
                   to="/setting"

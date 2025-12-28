@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import { Trash2, Plus, Minus } from "lucide-react"
 import Header from "../../../components/Header"
 import Footer from "../../../components/Footer"
@@ -206,9 +207,11 @@ function Cart() {
             <span>{totalPrice.toLocaleString()} VND</span>
           </div>
 
-          <button className="w-full bg-black text-white py-3 font-frankfurter">
+          <Link
+            to="/checkout"
+            className="w-full bg-black text-white py-3 px-3 font-frankfurter">
             Checkout
-          </button>
+          </Link>
         </div>
       </div>
 
