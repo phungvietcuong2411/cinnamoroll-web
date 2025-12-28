@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import {
   Menu,
@@ -11,12 +11,31 @@ import {
   Settings,
   Truck
 } from "lucide-react"
+import { jwtDecode } from "jwt-decode"
 
 
 function Header() {
   const [open, setOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
   const [mobileAccountOpen, setMobileAccountOpen] = useState(false)
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      try {
+        const decoded = jwtDecode(token)
+        setUser(decoded)
+      } catch (err) {
+        console.error('Invalid token')
+        localStorage.removeItem('token')
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    console.log('USER STATE:', user)
+  }, [user])
 
 
   return (
@@ -68,7 +87,9 @@ function Header() {
                 {/* USER INFO */}
                 <div className="mb-3">
                   <p className="text-sm text-blue-400">Hello,</p>
-                  <p className="font-semibold">Guest</p>
+                  <p className="font-futura-regular">
+                    {user ? user.name : 'Guest'}
+                  </p>
                 </div>
 
                 <hr className="border-blue-200 mb-3" />
@@ -175,7 +196,9 @@ function Header() {
               <div className="mt-4 ml-6 flex flex-col gap-4 text-blue-500">
                 <div>
                   <p className="text-sm text-blue-400">Hello,</p>
-                  <p className="font-semibold">Guest</p>
+                  <p className="font-futura-regular">
+                    {user ? user.name : 'Guest'}
+                  </p>
                 </div>
 
                 <Link

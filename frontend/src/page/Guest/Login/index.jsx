@@ -1,14 +1,67 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { login } from "../../../services/auth.service"
+import { createUser } from "../../../services/user.service"
 
 function Login() {
+  const navigate = useNavigate()
   const [isRegister, setIsRegister] = useState(false)
+
+  const [form, setForm] = useState({
+    account: "",
+    password: "",
+    confirmPassword: "",
+    name: "",
+    phone: "",
+    gmail: "",
+    address: ""
+  })
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = async () => {
+    try {
+      if (isRegister) {
+        if (form.password.length < 6 || form.password.length > 15) {
+          return alert("Password must be between 6 and 15 characters")
+        }
+
+        if (form.password !== form.confirmPassword) {
+          return alert("Password not match")
+        }
+        await createUser({
+          account: form.account,
+          password: form.password,
+          name: form.name,
+          phone: form.phone,
+          gmail: form.gmail,
+          address: form.address
+        })
+
+        alert("Register success")
+        setIsRegister(false)
+        return
+      }
+
+      await login({
+        account: form.account,
+        password: form.password
+      })
+
+      alert("Login success")
+      navigate("/home")
+
+    } catch (err) {
+      alert(err.response?.data?.message || "Something went wrong")
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center px-4">
       <div className="bg-white w-full max-w-md shadow-lg px-8 py-10">
 
-        {/* LOGO */}
         <Link
           to="/home"
           className="block text-center text-3xl md:text-4xl text-blue-400 font-frankfurter mb-4"
@@ -16,69 +69,54 @@ function Login() {
           CINNAMOROLL
         </Link>
 
-        {/* TITLE */}
         <h2 className="font-futura-regular text-2xl mb-6 text-center">
           {isRegister ? "Create Account" : "Login"}
         </h2>
 
-        {/* FORM */}
-        <form className="flex flex-col gap-5">
-
-          {/* ACCOUNT */}
-          <div className="font-futura-regular">
-            <label className="block text-lg mb-1">
-              Account
-            </label>
-            <input
-              type="text"
-              placeholder="Enter your account"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300
-                         focus:border-blue-400 focus:ring-2 focus:ring-blue-200
-                         outline-none transition"
-            />
-          </div>
-
-          {/* PASSWORD */}
-          <div className="font-futura-regular">
-            <label className="block text-lg mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300
-                         focus:border-blue-400 focus:ring-2 focus:ring-blue-200
-                         outline-none transition"
-            />
-          </div>
-
-          {/* CONFIRM PASSWORD - REGISTER */}
+        <div className="flex flex-col gap-5">
           {isRegister && (
-            <div className="font-futura-regular">
-              <label className="block text-lg mb-1">
-                Confirm Password
-              </label>
-              <input
+            <>
+              <Input label="Account" name="account" onChange={handleChange} />
+              <Input
+                label="Password (6–15 characters)"
                 type="password"
-                placeholder="Re-enter your password"
-                className="w-full px-4 py-2 rounded-lg border border-gray-300
-                           focus:border-blue-400 focus:ring-2 focus:ring-blue-200
-                           outline-none transition"
+                name="password"
+                onChange={handleChange}
               />
-            </div>
+              <Input
+                label="Confirm Password"
+                type="password"
+                name="confirmPassword"
+                onChange={handleChange}
+              />
+            </>
+          )}
+          {isRegister && (
+            <>
+              <Input label="Full Name" name="name" onChange={handleChange} />
+              <Input label="Phone Number" name="phone" onChange={handleChange} />
+              <Input label="Email" name="gmail" onChange={handleChange} />
+              <Input label="Address" name="address" onChange={handleChange} />
+            </>
           )}
 
-          {/* SUBMIT */}
+          {!isRegister && (
+            <>
+              <Input label="Account" name="account" onChange={handleChange} />
+              <Input label="Password" type="password" name="password" onChange={handleChange} />
+            </>
+          )}
+
           <button
-            type="button"
+            onClick={handleSubmit}
             className="mt-4 bg-blue-400 text-white py-2
-                       hover:bg-blue-500 transition font-semibold font-futura-regular"
+               hover:bg-blue-500 transition font-semibold font-futura-regular"
           >
             {isRegister ? "Register" : "Login"}
           </button>
-        </form>
+        </div>
 
-        {/* SWITCH MODE */}
+
         <div className="mt-6 text-center text-sm font-futura-regular">
           {isRegister ? (
             <p>
@@ -104,6 +142,22 @@ function Login() {
         </div>
 
       </div>
+    </div>
+  )
+}
+
+function Input({ label, type = "text", name, onChange }) {
+  return (
+    <div className="font-futura-regular">
+      <label className="block text-lg mb-1">{label}</label>
+      <input
+        name={name}
+        type={type}
+        onChange={onChange}
+        className="w-full px-4 py-2 rounded-lg border border-gray-300
+                   focus:border-blue-400 focus:ring-2 focus:ring-blue-200
+                   outline-none transition"
+      />
     </div>
   )
 }
