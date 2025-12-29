@@ -16,7 +16,7 @@ const statusText = {
   cancelled: "Cancelled"
 }
 
-const statusColor = status => {
+const statusColor = (status) => {
   switch (status) {
     case "preparing":
       return "text-yellow-600"
@@ -30,6 +30,15 @@ const statusColor = status => {
       return "text-gray-500"
   }
 }
+
+/* ================= DATE FORMAT ================= */
+const formatDateVN = (date) => {
+  const d = new Date(date)
+  d.setHours(d.getHours() + 7)
+  return d.toLocaleString("vi-VN")
+}
+
+
 function Order() {
   /* ================= STATE ================= */
   const [orders, setOrders] = useState([])
@@ -38,41 +47,38 @@ function Order() {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [orderItems, setOrderItems] = useState([])
   const [loadingDetail, setLoadingDetail] = useState(false)
+
   const [cancelTarget, setCancelTarget] = useState(null)
   const [cancelLoading, setCancelLoading] = useState(false)
+
   const [message, setMessage] = useState(null)
 
   /* ================= FETCH ORDERS ================= */
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoadingOrders(true)
-        const res = await getMyOrders()
-        setOrders(res.data || [])
-      } catch (err) {
-        console.error(err)
-        setMessage("Không thể tải danh sách đơn hàng")
-      } finally {
-        setLoadingOrders(false)
-      }
+  const fetchOrders = async () => {
+    try {
+      setLoadingOrders(true)
+      const res = await getMyOrders()
+      setOrders(res.data || [])
+    } catch (err) {
+      console.error(err)
+      setMessage("Không thể tải danh sách đơn hàng")
+    } finally {
+      setLoadingOrders(false)
     }
+  }
 
+  useEffect(() => {
     fetchOrders()
   }, [])
 
   /* ================= OPEN ORDER DETAIL ================= */
   const openOrderDetail = async (order) => {
     try {
-      console.log("OPEN ORDER ID:", order.id)
-
       setSelectedOrder(order)
       setOrderItems([])
       setLoadingDetail(true)
 
       const res = await getOrderProductsByOrder(order.id)
-
-      console.log("ORDER ITEMS:", res.data)
-
       setOrderItems(res.data || [])
     } catch (err) {
       console.error(err)
@@ -90,16 +96,20 @@ function Order() {
 
   /* ================= CANCEL ORDER ================= */
   const handleCancelOrder = async () => {
+    if (!cancelTarget) return
+
     try {
       setCancelLoading(true)
       await cancelOrder(cancelTarget.id)
 
+      // đóng modal
       setCancelTarget(null)
       setSelectedOrder(null)
 
+      // reload orders
       await fetchOrders()
     } catch (err) {
-      console.error(err)
+      console.error("Cancel order failed:", err)
     } finally {
       setCancelLoading(false)
     }
@@ -145,7 +155,7 @@ function Order() {
                   Order ID: <b>#{order.id}</b>
                 </p>
                 <p className="text-xs text-gray-500">
-                  {new Date(order.order_date).toLocaleDateString()}
+                  {formatDateVN(order.order_date)}
                 </p>
               </div>
 
@@ -161,6 +171,7 @@ function Order() {
                   {order.price.toLocaleString()} VND
                 </span>
               </p>
+
               <div className="flex gap-4">
                 {order.status === "preparing" && (
                   <button
@@ -170,6 +181,7 @@ function Order() {
                     Cancel
                   </button>
                 )}
+
                 <button
                   onClick={() => openOrderDetail(order)}
                   className="border px-4 py-2 text-sm hover:bg-black hover:text-white transition"
@@ -182,7 +194,7 @@ function Order() {
         ))}
       </div>
 
-      {/* ================= MODAL DETAIL ================= */}
+      {/* ================= ORDER DETAIL MODAL ================= */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-black/40 z-50 flex justify-center items-center">
           <div className="bg-white w-[95%] md:w-[700px] max-h-[90vh] overflow-y-auto p-5 relative font-futura-regular">
@@ -197,13 +209,9 @@ function Order() {
               Order Detail
             </h2>
 
-            {/* INFO */}
             <div className="text-sm space-y-1 mb-4">
               <p><b>Order ID:</b> #{selectedOrder.id}</p>
-              <p>
-                <b>Date:</b>{" "}
-                {new Date(selectedOrder.order_date).toLocaleString()}
-              </p>
+              <p><b>Date:</b> {formatDateVN(selectedOrder.order_date)}</p>
               <p>
                 <b>Status:</b>{" "}
                 <span className={statusColor(selectedOrder.status)}>
@@ -214,7 +222,6 @@ function Order() {
               <p><b>Shipping:</b> {selectedOrder.shipping_address}</p>
             </div>
 
-            {/* ITEMS */}
             <div className="border-t pt-4 space-y-4">
               {loadingDetail && (
                 <p className="text-center text-gray-500 text-sm">
@@ -257,7 +264,6 @@ function Order() {
               ))}
             </div>
 
-            {/* TOTAL */}
             <div className="border-t mt-4 pt-4 flex justify-between">
               <span>Total</span>
               <span className="font-frankfurter text-lg">
@@ -267,6 +273,7 @@ function Order() {
           </div>
         </div>
       )}
+
       {/* ================= CANCEL CONFIRM MODAL ================= */}
       {cancelTarget && (
         <div className="fixed inset-0 bg-black/40 z-50 flex justify-center items-center">
