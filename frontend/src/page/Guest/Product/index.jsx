@@ -272,7 +272,7 @@ function Product() {
                                 <Link
                                     key={product.id}
                                     to={`/product/detail/${product.id}`}
-                                    className="bg-[#f7f7f7] p-3 relative md:w-70 md:h-94 w-full h-auto"
+                                    className="bg-[#f7f7f7] p-3 relative md:w-70 md:h-100 w-full h-auto flex flex-col items-center justify-between"
                                 >
 
                                     <button
@@ -280,17 +280,18 @@ function Product() {
                                         className="absolute top-3 right-3 z-10"
                                     >
                                     </button>
+                                    <div>
+                                        <img
+                                            src={product.imgMain}
+                                            alt={product.name}
+                                            className="rounded-lg mb-3"
+                                        />
 
-                                    <img
-                                        src={product.imgMain}
-                                        alt={product.name}
-                                        className="rounded-lg mb-3"
-                                    />
+                                        <p className="font-futura-regular text-sm my-4">
+                                            {product.name}
+                                        </p>
 
-                                    <p className="font-futura-regular text-sm my-4">
-                                        {product.name}
-                                    </p>
-
+                                    </div>
                                     <p className="font-frankfurter border px-3 py-2 text-sm inline-block w-full text-center bg-white">
                                         {Number(product.price).toLocaleString("vi-VN")} VND
                                     </p>
