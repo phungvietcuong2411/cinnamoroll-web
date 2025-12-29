@@ -1,43 +1,44 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Heart, Trash2 } from "lucide-react"
 import { Link } from "react-router-dom"
 import Header from "../../../components/Header"
 import Footer from "../../../components/Footer"
+import {
+  getMyFollows,
+  unfollowProduct
+} from "../../../services/follow.service"
 
-const CLOUDINARY =
-  "https://res.cloudinary.com/dhjs4exbp/image/upload/v1766834099/"
-
-/* ===== TEMP FOLLOW DATA ===== */
-const initialFollow = [
-  {
-    id: 1,
-    name: 'Cinnamoroll 12" Plush',
-    price: 100000,
-    image: "image_66_acnsx0.jpg",
-    stock: 12
-  },
-  {
-    id: 2,
-    name: "Kuromi Plush",
-    price: 120000,
-    image: "image_64_ndweuj.jpg",
-    stock: 5
-  },
-  {
-    id: 3,
-    name: "My Melody Plush",
-    price: 95000,
-    image: "image_50_ueejft.jpg",
-    stock: 0
-  }
-]
 
 function Follow() {
-  const [followList, setFollowList] = useState(initialFollow)
+  const [followList, setFollowList] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const removeItem = id => {
-    setFollowList(prev => prev.filter(item => item.id !== id))
+  useEffect(() => {
+    const fetchFollows = async () => {
+      try {
+        const res = await getMyFollows()
+        setFollowList(res.data)
+      } catch (err) {
+        console.error("Fetch follows failed", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchFollows()
+  }, [])
+
+  const removeItem = async (productId) => {
+    try {
+      await unfollowProduct(productId)
+      setFollowList(prev =>
+        prev.filter(item => item.productId !== productId)
+      )
+    } catch (err) {
+      console.error("Unfollow failed", err)
+    }
   }
+
 
   return (
     <>
@@ -73,21 +74,21 @@ function Follow() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {followList.map(item => (
               <div
-                key={item.id}
+                key={item.productId}
                 className="relative font-futura-regular"
               >
                 {/* REMOVE */}
                 <button
-                  onClick={() => removeItem(item.id)}
+                  onClick={() => removeItem(item.productId)}
                   className="absolute top-3 right-3 z-10 bg-white p-2 rounded-full shadow"
                 >
                   <Trash2 size={16} />
                 </button>
 
-                <Link to={`/product/detail/${item.id}`}>
+                <Link to={`/product/detail/${item.productId}`}>
                   <div className="bg-[#f7f7f7] p-3">
                     <img
-                      src={CLOUDINARY + item.image}
+                      src={item.imgMain}
                       alt={item.name}
                       className="rounded-lg aspect-square object-cover mb-3"
                     />
@@ -97,19 +98,8 @@ function Follow() {
                     </p>
 
                     <p className="font-frankfurter text-sm mb-2">
-                      {item.price.toLocaleString()} VND
+                      {Number(item.price).toLocaleString()} VND
                     </p>
-
-                    {/* STOCK */}
-                    {item.stock > 0 ? (
-                      <p className="text-xs text-green-600">
-                        In stock ({item.stock})
-                      </p>
-                    ) : (
-                      <p className="text-xs text-red-500">
-                        Out of stock
-                      </p>
-                    )}
                   </div>
                 </Link>
               </div>

@@ -19,3 +19,7 @@ export const updateUser = (id, data) => {
 export const deleteUser = (id) => {
   return axios.delete(`api/users/${id}`)
 }
+
+export const changePassword = (data) => {
+  return axios.put("api/users/change-password", data)
+}

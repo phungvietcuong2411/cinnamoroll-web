@@ -1,96 +1,136 @@
-import { useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Link } from "react-router-dom"
 import { Trash2, Plus, Minus } from "lucide-react"
 import Header from "../../../components/Header"
 import Footer from "../../../components/Footer"
-
-const CLOUDINARY =
-  "https://res.cloudinary.com/dhjs4exbp/image/upload/v1766834099/"
-
-/* ===== TEMP CART DATA ===== */
-const initialCart = [
-  {
-    id: 1,
-    name: 'Cinnamoroll 12" Plush',
-    price: 100000,
-    qty: 2,
-    stock: 12,
-    image: "image_66_acnsx0.jpg"
-  },
-  {
-    id: 2,
-    name: "Kuromi Plush",
-    price: 120000,
-    qty: 1,
-    stock: 8,
-    image: "image_64_ndweuj.jpg"
-  }
-]
+import {
+  getCart,
+  updateCart,
+  removeFromCart
+} from "../../../services/cart.service"
 
 function Cart() {
-  const [cart, setCart] = useState(initialCart)
+  const [cart, setCart] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const increase = id => {
+  // lưu timer debounce theo productId
+  const debounceMap = useRef({})
+
+  /* ================= FETCH CART ================= */
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        setLoading(true)
+        const res = await getCart()
+        setCart(res.data || [])
+      } catch (err) {
+        console.error("Get cart failed", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCart()
+  }, [])
+
+  /* ================= UPDATE QUANTITY (DEBOUNCE) ================= */
+  const updateQuantity = (item, newQty) => {
+    if (newQty < 1) return
+
+    // update UI trước (mượt, không lag)
     setCart(prev =>
-      prev.map(item =>
-        item.id === id && item.qty < item.stock
-          ? { ...item, qty: item.qty + 1 }
-          : item
+      prev.map(i =>
+        i.productId === item.productId
+          ? { ...i, quantity: newQty }
+          : i
       )
     )
+
+    // clear debounce cũ nếu có
+    if (debounceMap.current[item.productId]) {
+      clearTimeout(debounceMap.current[item.productId])
+    }
+
+    // debounce gọi API
+    debounceMap.current[item.productId] = setTimeout(async () => {
+      try {
+        await updateCart(item.productId, newQty)
+      } catch (err) {
+        console.error("Update cart failed", err)
+      }
+    }, 600)
   }
 
-  const decrease = id => {
-    setCart(prev =>
-      prev.map(item =>
-        item.id === id && item.qty > 1
-          ? { ...item, qty: item.qty - 1 }
-          : item
-      )
-    )
+  /* ================= INCREASE / DECREASE ================= */
+  const increase = item => {
+    updateQuantity(item, item.quantity + 1)
   }
 
-  const removeItem = id => {
-    setCart(prev => prev.filter(item => item.id !== id))
+  const decrease = item => {
+    updateQuantity(item, item.quantity - 1)
   }
 
+  /* ================= REMOVE ================= */
+  const removeItem = async (productId) => {
+    try {
+      await removeFromCart(productId)
+      setCart(prev => prev.filter(i => i.productId !== productId))
+    } catch (err) {
+      console.error("Remove cart failed", err)
+    }
+  }
+
+  /* ================= TOTAL ================= */
   const totalPrice = cart.reduce(
-    (sum, item) => sum + item.price * item.qty,
+    (sum, item) => sum + Number(item.price) * item.quantity,
     0
   )
+
+  /* ================= LOADING ================= */
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="h-16"></div>
+        <div className="h-32 flex items-center justify-center font-frankfurter">
+          Loading cart...
+        </div>
+        <Footer />
+      </>
+    )
+  }
 
   return (
     <>
       <Header />
       <div className="h-16" />
 
-      {/* ===== TITLE ===== */}
       <div className="h-24 flex items-center justify-center">
         <h1 className="font-frankfurter text-3xl md:text-5xl">
           Shopping Cart
         </h1>
       </div>
 
-      {/* ===== DESKTOP TABLE ===== */}
+      {/* ================= DESKTOP ================= */}
       <div className="hidden md:block px-10">
         <table className="w-full font-futura-regular">
-          <thead className="text-lg border-b">
+          <thead className="border-b">
             <tr>
               <th className="text-left py-4 w-1/2">Product</th>
-              <th className="py-4">Price</th>
-              <th className="py-4">Quantity</th>
-              <th className="py-4">Total</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
               <th />
             </tr>
           </thead>
 
           <tbody>
             {cart.map(item => (
-              <tr key={item.id} className="border-b">
+              <tr key={item.productId} className="border-b">
                 <td className="py-6">
                   <div className="flex items-center gap-4">
                     <img
-                      src={CLOUDINARY + item.image}
+                      src={item.imgMain}
                       alt={item.name}
                       className="h-24 w-24 object-cover"
                     />
@@ -99,22 +139,33 @@ function Cart() {
                 </td>
 
                 <td className="text-center">
-                  {item.price.toLocaleString()} VND
+                  {Number(item.price).toLocaleString()} VND
                 </td>
 
+                {/* ===== QUANTITY (INPUT + / -) ===== */}
                 <td className="text-center">
-                  <div className="inline-flex border">
+                  <div className="inline-flex border items-center">
                     <button
-                      onClick={() => decrease(item.id)}
+                      onClick={() => decrease(item)}
                       className="px-3 py-2 border-r"
                     >
                       <Minus size={14} />
                     </button>
-                    <div className="px-4 py-2">
-                      {item.qty}
-                    </div>
+
+                    <input
+                      type="number"
+                      min={1}
+                      value={item.quantity}
+                      onChange={e => {
+                        const value = Number(e.target.value)
+                        if (isNaN(value)) return
+                        updateQuantity(item, value)
+                      }}
+                      className="w-16 text-center outline-none"
+                    />
+
                     <button
-                      onClick={() => increase(item.id)}
+                      onClick={() => increase(item)}
                       className="px-3 py-2 border-l"
                     >
                       <Plus size={14} />
@@ -123,12 +174,12 @@ function Cart() {
                 </td>
 
                 <td className="text-center">
-                  {(item.price * item.qty).toLocaleString()} VND
+                  {(item.quantity * Number(item.price)).toLocaleString()} VND
                 </td>
 
                 <td className="text-center">
                   <button
-                    onClick={() => removeItem(item.id)}
+                    onClick={() => removeItem(item.productId)}
                     className="text-red-500"
                   >
                     <Trash2 size={18} />
@@ -140,67 +191,8 @@ function Cart() {
         </table>
       </div>
 
-      {/* ===== MOBILE CART ===== */}
-      <div className="md:hidden px-4 space-y-6">
-        {cart.map(item => (
-          <div
-            key={item.id}
-            className="border p-4 rounded-lg font-futura-regular"
-          >
-            <div className="flex gap-4 mb-4">
-              <img
-                src={CLOUDINARY + item.image}
-                alt={item.name}
-                className="h-24 w-24 object-cover"
-              />
-
-              <div className="flex-1">
-                <p className="mb-1">{item.name}</p>
-                <p className="text-sm mb-2">
-                  {item.price.toLocaleString()} VND
-                </p>
-
-                <div className="flex items-center gap-3">
-                  <div className="flex border">
-                    <button
-                      onClick={() => decrease(item.id)}
-                      className="px-3 py-2 border-r"
-                    >
-                      -
-                    </button>
-                    <div className="px-4 py-2">
-                      {item.qty}
-                    </div>
-                    <button
-                      onClick={() => increase(item.id)}
-                      className="px-3 py-2 border-l"
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={() => removeItem(item.id)}
-                    className="text-red-500"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-between text-sm">
-              <span>Total</span>
-              <span className="font-bold">
-                {(item.price * item.qty).toLocaleString()} VND
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* ===== CART SUMMARY ===== */}
-      <div className="px-4 md:px-10 my-10 flex flex-col md:flex-row justify-end">
+      {/* ================= SUMMARY ================= */}
+      <div className="px-4 md:px-10 my-10 flex justify-end">
         <div className="w-full md:w-96 border p-6 font-futura-regular">
           <div className="flex justify-between mb-4">
             <span>Subtotal</span>
@@ -209,7 +201,8 @@ function Cart() {
 
           <Link
             to="/checkout"
-            className="w-full bg-black text-white py-3 px-3 font-frankfurter">
+            className="block text-center bg-black text-white py-3 font-frankfurter"
+          >
             Checkout
           </Link>
         </div>
