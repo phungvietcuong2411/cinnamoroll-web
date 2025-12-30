@@ -2,23 +2,25 @@ import { useEffect, useState } from "react"
 import Header from "../../../components/Header"
 import Footer from "../../../components/Footer"
 import { jwtDecode } from "jwt-decode"
-
 import { getCart } from "../../../services/cart.service"
 import { getUserById } from "../../../services/user.service"
-import { createOrder } from "../../../services/order.service"
-import { createOrderProducts } from "../../../services/orderProduct.service"
-
+import { createPayment } from "../../../services/vnpay.service"
+import { createOrder, createOrderVNpay } from "../../../services/order.service"
+import {
+  createOrderProducts,
+  createOrderProductsVNPay
+} from "../../../services/orderProduct.service"
 
 function Checkout() {
-  /* ================= TOKEN → USER ================= */
   const token = localStorage.getItem("token")
   const decoded = token ? jwtDecode(token) : null
   const userId = decoded?.id
 
-  /* ================= STATE ================= */
   const [loading, setLoading] = useState(false)
   const [payment, setPayment] = useState("COD")
-
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [orderSuccess, setOrderSuccess] = useState(false)
+  const [countdown, setCountdown] = useState(10)
   const [cartItems, setCartItems] = useState([])
 
   const [customer, setCustomer] = useState({
@@ -54,6 +56,16 @@ function Checkout() {
 
     fetchUser()
   }, [userId])
+
+  useEffect(() => {
+    if (!orderSuccess) return
+
+    const timer = setInterval(() => {
+      setCountdown(prev => prev - 1)
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [orderSuccess])
 
   /* ================= FETCH CART ================= */
   useEffect(() => {
@@ -95,63 +107,72 @@ function Checkout() {
 
 const handleSubmit = async e => {
   e.preventDefault()
-
-  if (!cartItems.length) {
-    setMessage({
-      type: "error",
-      text: "Giỏ hàng trống"
-    })
-    return
-  }
+  if (!cartItems.length || isSubmitting) return
 
   try {
+    setIsSubmitting(true)
     setLoading(true)
     setMessage(null)
 
-    /* ================= CREATE ORDER ================= */
-    const orderRes = await createOrder({
-      paymentMethod: payment,
-      shippingAddress: customer.address,
-      price: total
-    })
-
-    const orderId = orderRes.data.id
-
-    /* ================= CREATE ORDER PRODUCTS ================= */
     const cartIds = cartItems.map(item => item.id)
 
-    await createOrderProducts({
-      orderId,
-      cartIds
-    })
-
-    /* ================= COD SUCCESS ================= */
+    /* ================= COD ================= */
     if (payment === "COD") {
+      const orderRes = await createOrder({
+        paymentMethod: "COD",
+        shippingAddress: customer.address,
+        price: total
+      })
+
+      const orderId = orderRes.data.id
+
+      await createOrderProducts({ orderId, cartIds })
+
+      setOrderSuccess(true)
       setMessage({
         type: "success",
         text: "Đặt hàng thành công! Cảm ơn bạn."
       })
 
-      // 👉 sau này có thể navigate("/orders")
+      setTimeout(() => {
+        window.location.href = "/home"
+      }, 10000)
+
+      return
     }
 
-    /* ================= VNPAY (LÀM SAU) ================= */
+    /* ================= VNPAY ================= */
     if (payment === "VNPAY") {
-      // redirect VNPAY sau
+      const orderRes = await createOrderVNpay({
+        paymentMethod: "VNPAY",
+        shippingAddress: customer.address,
+        price: total
+      })
+
+      const orderId = orderRes.data.id
+
+      const payRes = await createPayment({
+        orderId,
+        totalPrice: total
+      })
+
+      window.location.href = payRes.data.paymentUrl
     }
+
   } catch (err) {
     console.error(err)
     setMessage({
       type: "error",
       text: "Đặt hàng thất bại, vui lòng thử lại"
     })
+    setIsSubmitting(false)
   } finally {
     setLoading(false)
   }
 }
 
 
-  /* ================= UI ================= */
+
   return (
     <>
       <Header />
@@ -263,8 +284,8 @@ const handleSubmit = async e => {
 
           {/* ================= RIGHT ================= */}
           <div className="border p-5 h-fit">
-            <h2 className="font-futura-regular text-xl mb-4">
-              TÓM TẮT ĐƠN HÀNG
+            <h2 className="font-frankfurter text-xl mb-4">
+              Tóm tắt đơn hàng
             </h2>
 
             {loading && (
@@ -298,28 +319,43 @@ const handleSubmit = async e => {
 
             <div className="border-t pt-4 space-y-2 text-sm">
               <div className="flex justify-between">
-                <span>Tổng tiền</span>
+                <span>Giá tiền</span>
                 <span>{subtotal.toLocaleString()} VND</span>
               </div>
 
               <div className="flex justify-between">
-                <span>Tiền giao hàng</span>
+                <span>Tiền ship</span>
                 <span>{shippingFee.toLocaleString()} VND</span>
               </div>
 
-              <div className="flex justify-between font-futura-regular text-lg">
-                <span>Tổng</span>
+              <div className="flex justify-between font-frankfurter text-lg">
+                <span>Tổng tiền</span>
                 <span>{total.toLocaleString()} VND</span>
               </div>
             </div>
 
             <button
               type="submit"
-              disabled={!cartItems.length}
-              className="w-full bg-black text-white py-4 mt-6 font-futura-regular disabled:opacity-50 cursor-pointer"
+              disabled={!cartItems.length || isSubmitting || orderSuccess}
+              className={`w-full py-4 mt-6 font-frankfurter transition
+                  ${isSubmitting || orderSuccess
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-black text-white hover:opacity-90"
+                }`}
             >
-              Tạo hóa đơn
+              {isSubmitting
+                ? "Đang xử lý..."
+                : orderSuccess
+                  ? "Đặt hàng thành công"
+                  : "Place Order"
+              }
             </button>
+            {orderSuccess && (
+              <p className="text-center text-sm text-gray-500 mt-3">
+                Tự động về trang chủ sau {countdown}s
+              </p>
+            )}
+
           </div>
         </form>
       </div>

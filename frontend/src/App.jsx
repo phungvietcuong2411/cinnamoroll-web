@@ -9,6 +9,8 @@ import Follow from "./page/Guest/Follow"
 import Order from "./page/Guest/Order"
 import Checkout from "./page/Guest/Checkout"
 import Setting from "./page/Guest/Setting"
+import PaymentSuccess from "./page/Guest/Payment/PaymentSuccess"
+import PaymentFailed from "./page/Guest/Payment/PaymentFailed"
 // import Support from "./page/Guest/Support"
 // import Sale from "./page/Guest/Sale"
 // import Cart from "./page/User/Cart"
@@ -31,6 +33,8 @@ function App() {
         <Route path="/order" element={<Order />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/setting" element={<Setting />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-failed" element={<PaymentFailed />} />
         {/* User */}
         <Route path="/cart" element={<Cart />} />
         {/* <Route path="/follows" element={<Follows />} /> */}

@@ -11,6 +11,7 @@ import { getOrderProductsByOrder } from "../../../services/orderProduct.service"
 /* ================= STATUS UI ================= */
 const statusText = {
   preparing: "Đang chuẩn bị",
+  paid: "Đã thanh toán và chờ hàng",
   processing: "Đang giao hàng",
   completed: "Hoàn thành",
   cancelled: "Đã hủy"
