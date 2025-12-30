@@ -92,8 +92,8 @@ function Cart() {
       <>
         <Header />
         <div className="h-16"></div>
-        <div className="h-32 flex items-center justify-center font-frankfurter">
-          Loading cart...
+        <div className="h-32 flex items-center justify-center font-futura-regular">
+          Đang tải
         </div>
         <Footer />
       </>
@@ -106,8 +106,8 @@ function Cart() {
       <div className="h-16" />
 
       <div className="h-24 flex items-center justify-center">
-        <h1 className="font-frankfurter text-3xl md:text-5xl">
-          Shopping Cart
+        <h1 className="font-futura-regular text-3xl md:text-5xl">
+          GIỎ HÀNG CỦA BẠN
         </h1>
       </div>
 
@@ -116,10 +116,10 @@ function Cart() {
         <table className="w-full font-futura-regular">
           <thead className="border-b">
             <tr>
-              <th className="text-left py-4 w-1/2">Product</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Total</th>
+              <th className="text-left py-4 w-1/2">Sản phẩm</th>
+              <th>Giá tiền</th>
+              <th>Số lượng</th>
+              <th>Tổng tiền</th>
               <th />
             </tr>
           </thead>
@@ -195,7 +195,7 @@ function Cart() {
       <div className="px-4 md:px-10 my-10 flex justify-end">
         <div className="w-full md:w-96 border p-6 font-futura-regular">
           <div className="flex justify-between mb-4">
-            <span>Subtotal</span>
+            <span>Tổng tiền</span>
             <span>{totalPrice.toLocaleString()} VND</span>
           </div>
 

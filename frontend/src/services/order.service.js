@@ -19,3 +19,7 @@ export const createOrder = (data) => {
 export const cancelOrder = (orderId) => {
   return axios.put(`api/orders/${orderId}/cancel`)
 }
+
+export const deleteOrder = (orderId) => {
+  return axios.delete(`api/orders/${orderId}`)
+}

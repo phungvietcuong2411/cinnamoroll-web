@@ -29,7 +29,7 @@ function More() {
 
             {/* Note */}
             <p className="mt-6 text-center text-sm md:text-base text-gray-600 font-futura-regular ">
-                * Discover more Cinnamoroll goodies, wallpapers, gift cards, and calendars available in our shop.
+                * Khám phá thêm nhiều sản phẩm Cinnamoroll, hình nền, thiệp quà tặng và lịch có sẵn trong cửa hàng của chúng tôi.
             </p>
         </div>
     )

@@ -5,15 +5,15 @@ import { Link } from "react-router-dom"
 import Header from "../../../components/Header"
 import Footer from "../../../components/Footer"
 
-import { getMyOrders, cancelOrder } from "../../../services/order.service"
+import { getMyOrders, cancelOrder, deleteOrder } from "../../../services/order.service"
 import { getOrderProductsByOrder } from "../../../services/orderProduct.service"
 
 /* ================= STATUS UI ================= */
 const statusText = {
-  preparing: "Preparing",
-  processing: "Processing",
-  completed: "Completed",
-  cancelled: "Cancelled"
+  preparing: "Đang chuẩn bị",
+  processing: "Đang giao hàng",
+  completed: "Hoàn thành",
+  cancelled: "Đã hủy"
 }
 
 const statusColor = (status) => {
@@ -50,6 +50,9 @@ function Order() {
 
   const [cancelTarget, setCancelTarget] = useState(null)
   const [cancelLoading, setCancelLoading] = useState(false)
+
+  const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   const [message, setMessage] = useState(null)
 
@@ -115,6 +118,26 @@ function Order() {
     }
   }
 
+  /* ================= DELETE ORDER ================= */
+  const handleDeleteOrder = async () => {
+    if (!deleteTarget) return
+
+    try {
+      setDeleteLoading(true)
+      await deleteOrder(deleteTarget.id)
+
+      setDeleteTarget(null)
+      setSelectedOrder(null)
+
+      await fetchOrders()
+    } catch (err) {
+      console.error("Delete order failed:", err)
+      setMessage("Không thể xóa đơn hàng")
+    } finally {
+      setDeleteLoading(false)
+    }
+  }
+
   return (
     <>
       <Header />
@@ -122,8 +145,8 @@ function Order() {
 
       {/* ================= TITLE ================= */}
       <div className="h-24 flex items-center justify-center">
-        <h1 className="font-frankfurter text-3xl md:text-5xl">
-          My Orders
+        <h1 className="font-futura-regular text-3xl md:text-5xl">
+          ĐƠN HÀNG CỦA TÔI
         </h1>
       </div>
 
@@ -131,7 +154,7 @@ function Order() {
       <div className="px-4 md:px-36 mb-20 space-y-6 font-futura-regular">
         {loadingOrders && (
           <p className="text-center text-gray-500">
-            Loading orders...
+            Đang tải...
           </p>
         )}
 
@@ -152,7 +175,7 @@ function Order() {
             <div className="flex justify-between items-center mb-3">
               <div>
                 <p className="text-sm">
-                  Order ID: <b>#{order.id}</b>
+                  Mã đơn hàng: <b>#{order.id}</b>
                 </p>
                 <p className="text-xs text-gray-500">
                   {formatDateVN(order.order_date)}
@@ -166,27 +189,36 @@ function Order() {
 
             <div className="flex justify-between items-center">
               <p className="text-sm">
-                Total:{" "}
+                Tổng tiền:{" "}
                 <span className="font-frankfurter">
                   {order.price.toLocaleString()} VND
                 </span>
               </p>
 
               <div className="flex gap-4">
+                {order.status === "cancelled" && (
+                  <button
+                    onClick={() => setDeleteTarget(order)}
+                    className="border px-4 py-2 text-sm text-red-600 border-red-600 
+               hover:bg-red-600 hover:text-white transition cursor-pointer"
+                  >
+                    Xóa đơn hàng
+                  </button>
+                )}
                 {order.status === "preparing" && (
                   <button
                     onClick={() => setCancelTarget(order)}
-                    className="border px-4 py-2 text-sm text-red-600 border-red-600 hover:bg-red-600 hover:text-white transition"
+                    className="border px-4 py-2 text-sm text-red-600 border-red-600 hover:bg-red-600 hover:text-white transition cursor-pointer"
                   >
-                    Cancel
+                    Hủy đơn hàng
                   </button>
                 )}
 
                 <button
                   onClick={() => openOrderDetail(order)}
-                  className="border px-4 py-2 text-sm hover:bg-black hover:text-white transition"
+                  className="border px-4 py-2 text-sm hover:bg-black hover:text-white transition cursor-pointer"
                 >
-                  View detail
+                  Chi tiết đơn hàng
                 </button>
               </div>
             </div>
@@ -205,27 +237,27 @@ function Order() {
               <X />
             </button>
 
-            <h2 className="font-frankfurter text-2xl mb-4">
-              Order Detail
+            <h2 className="font-futura-regular text-2xl mb-4">
+              Chi tiết đơn hàng
             </h2>
 
             <div className="text-sm space-y-1 mb-4">
-              <p><b>Order ID:</b> #{selectedOrder.id}</p>
-              <p><b>Date:</b> {formatDateVN(selectedOrder.order_date)}</p>
+              <p><b>Mã đơn hàng:</b> #{selectedOrder.id}</p>
+              <p><b>Ngày tạo:</b> {formatDateVN(selectedOrder.order_date)}</p>
               <p>
-                <b>Status:</b>{" "}
+                <b>Trạng thái:</b>{" "}
                 <span className={statusColor(selectedOrder.status)}>
                   {statusText[selectedOrder.status]}
                 </span>
               </p>
-              <p><b>Payment:</b> {selectedOrder.payment_method}</p>
-              <p><b>Shipping:</b> {selectedOrder.shipping_address}</p>
+              <p><b>Phương thức thanh toán:</b> {selectedOrder.payment_method}</p>
+              <p><b>Nơi giao hàng:</b> {selectedOrder.shipping_address}</p>
             </div>
 
             <div className="border-t pt-4 space-y-4">
               {loadingDetail && (
                 <p className="text-center text-gray-500 text-sm">
-                  Loading order items...
+                  Đang tải...
                 </p>
               )}
 
@@ -277,7 +309,7 @@ function Order() {
       {/* ================= CANCEL CONFIRM MODAL ================= */}
       {cancelTarget && (
         <div className="fixed inset-0 bg-black/40 z-50 flex justify-center items-center">
-          <div className="bg-white p-6 w-[90%] md:w-[400px] text-center">
+          <div className="bg-white p-6 w-[90%] md:w-100 text-center font-futura-regular border">
             <h3 className="text-lg font-bold mb-4">
               Bạn có chắc muốn hủy đơn hàng #{cancelTarget.id}?
             </h3>
@@ -285,7 +317,7 @@ function Order() {
             <div className="flex justify-center gap-4">
               <button
                 onClick={() => setCancelTarget(null)}
-                className="border px-4 py-2"
+                className="border px-4 py-2 cursor-pointer"
               >
                 Không
               </button>
@@ -293,9 +325,40 @@ function Order() {
               <button
                 onClick={handleCancelOrder}
                 disabled={cancelLoading}
-                className="bg-red-600 text-white px-4 py-2"
+                className="bg-red-600 text-white px-4 py-2 border border-black cursor-pointer"
               >
                 {cancelLoading ? "Đang hủy..." : "Hủy đơn"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ================= DELETE CONFIRM MODAL ================= */}
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex justify-center items-center">
+          <div className="bg-white p-6 w-[90%] md:w-100 text-center font-futura-regular border">
+            <h3 className="text-lg font-bold mb-4">
+              Bạn có chắc muốn <span className="text-red-600">xóa</span> đơn hàng #{deleteTarget.id}?
+            </h3>
+
+            <p className="text-sm text-gray-500 mb-4">
+              Hành động này không thể hoàn tác
+            </p>
+
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="border px-4 py-2 cursor-pointer"
+              >
+                Không
+              </button>
+
+              <button
+                onClick={handleDeleteOrder}
+                disabled={deleteLoading}
+                className="bg-red-600 text-white px-4 py-2 border border-black cursor-pointer"
+              >
+                {deleteLoading ? "Đang xóa..." : "Xóa đơn hàng"}
               </button>
             </div>
           </div>

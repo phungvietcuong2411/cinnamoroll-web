@@ -39,7 +39,6 @@ function Follow() {
     }
   }
 
-
   return (
     <>
       <Header />
@@ -47,8 +46,8 @@ function Follow() {
 
       {/* ===== TITLE ===== */}
       <div className="h-24 flex items-center justify-center">
-        <h1 className="font-frankfurter text-3xl md:text-5xl">
-          My Favorites
+        <h1 className="font-futura-regular text-3xl md:text-5xl">
+          SẢN PHẨM BẠN YÊU THÍCH
         </h1>
       </div>
 
@@ -86,7 +85,7 @@ function Follow() {
                 </button>
 
                 <Link to={`/product/detail/${item.productId}`}>
-                  <div className="bg-[#f7f7f7] p-3">
+                  <div className="bg-[#f7f7f7] p-3 h-100 flex flex-col justify-between">
                     <img
                       src={item.imgMain}
                       alt={item.name}

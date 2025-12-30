@@ -33,6 +33,7 @@
   font-family: 'Quicksand', sans-serif;
 }
 
+
 @font-face {
   font-family: 'Futura';
   src: url('./assets/font/Futura/SFUFuturaLight.TTF') format('truetype');
@@ -52,6 +53,8 @@
 .font-futura-regular {
   font-family: 'Futura', sans-serif;
 }
+
+
 
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {

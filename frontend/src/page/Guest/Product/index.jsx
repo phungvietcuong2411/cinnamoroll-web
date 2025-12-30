@@ -28,7 +28,7 @@ function Product() {
         let maxPrice = null
 
         priceArr.forEach(p => {
-            if (p === "Under 100.000 VND") {
+            if (p === "Dưới 100.000 VND") {
                 minPrice = minPrice === null ? 0 : minPrice
                 maxPrice = maxPrice === null ? 100000 : Math.min(maxPrice, 100000)
             }
@@ -43,7 +43,7 @@ function Product() {
                 maxPrice = maxPrice === null ? 300000 : Math.max(maxPrice, 300000)
             }
 
-            if (p === "Over 300.000 VND") {
+            if (p === "Trên 300.000 VND") {
                 minPrice = minPrice === null ? 300000 : Math.min(minPrice, 300000)
                 maxPrice = null
             }
@@ -103,7 +103,7 @@ function Product() {
     }, [])
 
 
-    const priceList = ["Under 100.000 VND", "100.000 VND - 200.000 VND", "200.000 VND - 300.000 VND", "Over 300.000 VND"]
+    const priceList = ["Dưới 100.000 VND", "100.000 VND - 200.000 VND", "200.000 VND - 300.000 VND", "Trên 300.000 VND"]
 
     /* ================= HANDLER ================= */
     const toggleItem = (value, setState) => {
@@ -157,21 +157,21 @@ function Product() {
                             <button onClick={() => setOpenMobileFilter(false)}>
                                 <ChevronLeft size={22} />
                             </button>
-                            <h2 className="font-frankfurter text-xl">Filter by</h2>
+                            <h2 className="font-futura-regular text-xl">Filter by</h2>
                         </div>
 
                         {/* DESKTOP HEADER */}
-                        <h1 className="font-frankfurter text-2xl mb-6 hidden md:block">
-                            PRODUCT
+                        <h1 className="font-futura-regular text-2xl mb-6 hidden md:block">
+                            SẢN PHẨM
                         </h1>
 
                         {/* FEATURED */}
-                        <div className="border-b pb-4 mb-4">
+                        <div className="border-b pb-4 mb-4 font-futura-regular">
                             <button
                                 onClick={() => setOpenFeatured(!openFeatured)}
                                 className="flex justify-between w-full text-sm"
                             >
-                                Featured
+                                Sắp xếp theo
                                 {openFeatured
                                     ? <ChevronLeft size={18} />
                                     : <ChevronRight size={18} />}
@@ -195,12 +195,12 @@ function Product() {
                         </div>
 
                         {/* TYPE */}
-                        <div className="border-b pb-4 mb-4">
+                        <div className="border-b pb-4 mb-4 font-futura-regular">
                             <button
                                 onClick={() => setOpenType(!openType)}
                                 className="flex justify-between w-full text-sm"
                             >
-                                Product Type
+                                Loại sản phẩm
                                 {openType
                                     ? <ChevronLeft size={18} />
                                     : <ChevronRight size={18} />}
@@ -225,7 +225,7 @@ function Product() {
                         </div>
 
                         {/* PRICE */}
-                        <div className="border-b pb-4 mb-4">
+                        <div className="border-b pb-4 mb-4 font-futura-regular">
                             <button
                                 onClick={() => setOpenPrice(!openPrice)}
                                 className="flex justify-between w-full text-sm"
@@ -261,7 +261,7 @@ function Product() {
                             }}
                             className="text-sm text-blue-500 hover:underline"
                         >
-                            Clear filters
+                            Xóa tùy chọn
                         </button>
                     </aside>
 

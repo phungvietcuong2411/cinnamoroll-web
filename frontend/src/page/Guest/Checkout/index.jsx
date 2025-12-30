@@ -182,8 +182,8 @@ const handleSubmit = async e => {
           <div className="space-y-6">
             {/* CUSTOMER INFO */}
             <div>
-              <h2 className="font-frankfurter text-xl mb-3">
-                Customer Information
+              <h2 className="font-futura-regular text-xl mb-3">
+                Thông tin cá nhân
               </h2>
 
               <div className="space-y-3">
@@ -219,8 +219,8 @@ const handleSubmit = async e => {
 
             {/* ADDRESS */}
             <div>
-              <h2 className="font-frankfurter text-xl mb-3">
-                Shipping Address
+              <h2 className="font-futura-regular text-xl mb-3">
+                Nơi giao hàng
               </h2>
 
               <input
@@ -235,8 +235,8 @@ const handleSubmit = async e => {
 
             {/* PAYMENT */}
             <div>
-              <h2 className="font-frankfurter text-xl mb-3">
-                Payment Method
+              <h2 className="font-futura-regular text-xl mb-3">
+                Phương thức thanh toán
               </h2>
 
               <div className="space-y-3">
@@ -246,7 +246,7 @@ const handleSubmit = async e => {
                     checked={payment === "COD"}
                     onChange={() => setPayment("COD")}
                   />
-                  Cash on Delivery (COD)
+                  Nhận hàng thanh toán (COD)
                 </label>
 
                 <label className="flex items-center gap-3 border p-3 cursor-pointer">
@@ -263,13 +263,13 @@ const handleSubmit = async e => {
 
           {/* ================= RIGHT ================= */}
           <div className="border p-5 h-fit">
-            <h2 className="font-frankfurter text-xl mb-4">
-              Order Summary
+            <h2 className="font-futura-regular text-xl mb-4">
+              TÓM TẮT ĐƠN HÀNG
             </h2>
 
             {loading && (
               <p className="text-sm text-gray-500 mb-4">
-                Loading cart...
+                Đang tải...
               </p>
             )}
 
@@ -298,17 +298,17 @@ const handleSubmit = async e => {
 
             <div className="border-t pt-4 space-y-2 text-sm">
               <div className="flex justify-between">
-                <span>Subtotal</span>
+                <span>Tổng tiền</span>
                 <span>{subtotal.toLocaleString()} VND</span>
               </div>
 
               <div className="flex justify-between">
-                <span>Shipping</span>
+                <span>Tiền giao hàng</span>
                 <span>{shippingFee.toLocaleString()} VND</span>
               </div>
 
-              <div className="flex justify-between font-frankfurter text-lg">
-                <span>Total</span>
+              <div className="flex justify-between font-futura-regular text-lg">
+                <span>Tổng</span>
                 <span>{total.toLocaleString()} VND</span>
               </div>
             </div>
@@ -316,9 +316,9 @@ const handleSubmit = async e => {
             <button
               type="submit"
               disabled={!cartItems.length}
-              className="w-full bg-black text-white py-4 mt-6 font-frankfurter disabled:opacity-50"
+              className="w-full bg-black text-white py-4 mt-6 font-futura-regular disabled:opacity-50 cursor-pointer"
             >
-              Place Order
+              Tạo hóa đơn
             </button>
           </div>
         </form>

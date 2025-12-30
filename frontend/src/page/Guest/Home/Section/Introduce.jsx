@@ -14,18 +14,18 @@ function Introduce() {
         </h1>
 
         <p className="font-futura-regular text-[16px] md:text-[18px]">
-          Cinnamoroll is Cafe Cinnamon's official mascot. He is quite shy, but very friendly,
-          and sometimes takes a nap on customers' laps. He can fly through the air by flapping
-          his huge ears.
+          Cinnamoroll là linh vật chính thức của quán cà phê Cinnamon.
+           Cậu ấy khá nhút nhát nhưng rất thân thiện, và đôi khi ngủ gật trên đùi khách hàng. 
+           Cậu ấy có thể bay lượn trên không trung bằng cách vẫy đôi tai to lớn của mình.
         </p>
 
         <Link
           to="/product"
-          className="font-frankfurter border border-black px-8 py-2
+          className="font-futura-regular border border-black px-8 py-2
                      transition-transform duration-300 ease-out
                      hover:scale-110 active:scale-105"
         >
-          SHOP NOW
+          KHÁM PHÁ NGAY
         </Link>
       </div>
 

@@ -75,16 +75,16 @@ function Detail() {
 
             setToast({
                 show: true,
-                message: "Added to cart successfully!",
+                message: "Thêm vào giỏ hàng thành công!",
                 type: "success"
             })
         } catch (err) {
-            console.error("Add to cart failed", err.response || err)
+            console.error("Thêm vào giỏ hàng thất bại", err.response || err)
 
             if (err.response?.status === 401) {
                 setToast({
                     show: true,
-                    message: "Please login to add products to cart",
+                    message: "Đăng nhập để thêm vào giỏ hàng",
                     type: "error"
                 })
             } else {
@@ -92,7 +92,7 @@ function Detail() {
                     show: true,
                     message:
                         err.response?.data?.message ||
-                        "Add to cart failed",
+                        "Thêm vào giỏ hàng thất bại",
                     type: "error"
                 })
             }
@@ -132,9 +132,9 @@ function Detail() {
 
             {/* ===== BREADCRUMB (DESKTOP ONLY) ===== */}
             <div className="hidden md:flex h-20 items-center font-futura-regular text-sm px-36 mb-8">
-                <span>Home</span>
+                <Link to="/home">Trang chủ</Link>
                 <span className="mx-2">/</span>
-                <span>Product</span>
+                <Link to="/product">Cửa hàng</Link>
                 <span className="mx-2">/</span>
                 <span>{product.name}</span>
             </div>
@@ -182,7 +182,7 @@ function Detail() {
                     </div>
 
                     <div className="font-futura-regular text-sm mb-4">
-                        Stock available:{" "}
+                        Số lượng còn lại:{" "}
                         <span className="font-bold">{product.quantity}</span>
                     </div>
 
@@ -252,41 +252,25 @@ function Detail() {
                         <button
                             onClick={handleAddToCart}
                             disabled={adding}
-                            className={`w-full border py-3 font-frankfurter transition flex items-center justify-center gap-2}`}
+                            className={`w-full border py-3 font-futura-regular transition flex items-center justify-center gap-2}`}
                         >
                             {adding ? (
                                 <>
                                     <LoaderCircle className="w-5 h-5 animate-spin" />
-                                    <span>Adding...</span>
+                                    <span>Đang thêm...</span>
                                 </>
                             ) : (
-                                "Add to cart"
+                                "Thêm vào giỏ hàng"
                             )}
                         </button>
-
-
-                    </div>
-
-                    {/* ===== DESCRIPTION ===== */}
-                    <div className="font-futura-regular text-sm leading-6">
-                        <p className="mb-2">
-                            Bundle up and let’s stay cozy with your favorite Sanrio
-                            Characters! These winter-themed plush feature everyone in
-                            puffer jackets with the most adorable hoods framing each
-                            character’s face.
-                        </p>
-                        <p>♡ Sitting position</p>
-                        <p>♡ Quilted puffer jacket and hood</p>
-                        <p>♡ Embroidered and applique details</p>
-                        <p>♡ Approx. 12”</p>
                     </div>
                 </div>
             </div>
 
             {/* ===== RELATED ===== */}
             <div className="my-16 px-4 md:px-36">
-                <h2 className="font-frankfurter text-3xl md:text-4xl text-center mb-8">
-                    You might also like...
+                <h2 className="font-futura-regular text-3xl md:text-4xl text-center mb-8">
+                    BẠN CÓ THỂ THÍCH
                 </h2>
 
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-6">
