@@ -13,10 +13,8 @@ function Cart() {
   const [cart, setCart] = useState([])
   const [loading, setLoading] = useState(true)
 
-  // lưu timer debounce theo productId
   const debounceMap = useRef({})
 
-  /* ================= FETCH CART ================= */
   useEffect(() => {
     const fetchCart = async () => {
       try {
@@ -33,11 +31,9 @@ function Cart() {
     fetchCart()
   }, [])
 
-  /* ================= UPDATE QUANTITY (DEBOUNCE) ================= */
   const updateQuantity = (item, newQty) => {
     if (newQty < 1) return
 
-    // update UI trước (mượt, không lag)
     setCart(prev =>
       prev.map(i =>
         i.productId === item.productId
@@ -46,12 +42,10 @@ function Cart() {
       )
     )
 
-    // clear debounce cũ nếu có
     if (debounceMap.current[item.productId]) {
       clearTimeout(debounceMap.current[item.productId])
     }
 
-    // debounce gọi API
     debounceMap.current[item.productId] = setTimeout(async () => {
       try {
         await updateCart(item.productId, newQty)
@@ -61,7 +55,6 @@ function Cart() {
     }, 600)
   }
 
-  /* ================= INCREASE / DECREASE ================= */
   const increase = item => {
     updateQuantity(item, item.quantity + 1)
   }
@@ -70,7 +63,6 @@ function Cart() {
     updateQuantity(item, item.quantity - 1)
   }
 
-  /* ================= REMOVE ================= */
   const removeItem = async (productId) => {
     try {
       await removeFromCart(productId)
@@ -80,13 +72,11 @@ function Cart() {
     }
   }
 
-  /* ================= TOTAL ================= */
   const totalPrice = cart.reduce(
     (sum, item) => sum + Number(item.price) * item.quantity,
     0
   )
 
-  /* ================= LOADING ================= */
   if (loading) {
     return (
       <>
@@ -111,7 +101,6 @@ function Cart() {
         </h1>
       </div>
 
-      {/* ================= DESKTOP ================= */}
       <div className="hidden md:block px-10">
         <table className="w-full font-futura-regular">
           <thead className="border-b">
@@ -142,7 +131,6 @@ function Cart() {
                   {Number(item.price).toLocaleString()} VND
                 </td>
 
-                {/* ===== QUANTITY (INPUT + / -) ===== */}
                 <td className="text-center">
                   <div className="inline-flex border items-center">
                     <button
@@ -191,7 +179,6 @@ function Cart() {
         </table>
       </div>
 
-      {/* ================= SUMMARY ================= */}
       <div className="px-4 md:px-10 my-10 flex justify-end">
         <div className="w-full md:w-96 border p-6 font-futura-regular">
           <div className="flex justify-between mb-4">
