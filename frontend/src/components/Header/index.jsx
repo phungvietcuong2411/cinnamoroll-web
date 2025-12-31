@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link , useNavigate } from "react-router-dom"
 import {
   Menu,
   X,
@@ -19,12 +19,15 @@ function Header() {
   const [accountOpen, setAccountOpen] = useState(false)
   const [mobileAccountOpen, setMobileAccountOpen] = useState(false)
   const [user, setUser] = useState(null)
+  const navigate = useNavigate()
+
 
   const handleLogout = () => {
     localStorage.removeItem("token")
     setUser(null)
     setAccountOpen(false)
     setMobileAccountOpen(false)
+    navigate("/login")
   }
 
   useEffect(() => {
