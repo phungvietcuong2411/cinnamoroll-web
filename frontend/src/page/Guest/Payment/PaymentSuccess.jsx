@@ -10,7 +10,7 @@ function PaymentSuccess() {
     useEffect(() => {
         const timer = setTimeout(() => {
             navigate("/home")
-        }, 30000)
+        }, 5000)
 
         return () => clearTimeout(timer)
     }, [navigate])

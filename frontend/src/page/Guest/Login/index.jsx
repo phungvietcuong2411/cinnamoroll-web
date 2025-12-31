@@ -33,13 +33,13 @@ function Login() {
       if (isRegister) {
         if (form.password.length < 6 || form.password.length > 15) {
           setMessageType("error")
-          setMessage("Password must be between 6 and 15 characters")
+          setMessage("Mật khẩu phải từ 6 đến 15 ký tự")
           return
         }
 
         if (form.password !== form.confirmPassword) {
           setMessageType("error")
-          setMessage("Password not match")
+          setMessage("Mật khẩu và mật khẩu xác nhận không khớp nhau")
           return
         }
 
@@ -53,7 +53,7 @@ function Login() {
         })
 
         setMessageType("success")
-        setMessage("Register success! Please login.")
+        setMessage("Đăng ký thành công! Đang chuyển hướng")
         setIsRegister(false)
         return
       }
@@ -64,12 +64,12 @@ function Login() {
       })
 
       setMessageType("success")
-      setMessage("Login success! Redirecting...")
+      setMessage("Đăng nhập thành công! Đang chuyển hướng")
       navigate("/home")
 
     } catch (err) {
       setMessageType("error")
-      setMessage(err.response?.data?.message || "Something went wrong")
+      setMessage(err.response?.data?.message || "Đang xẩy ra lỗi")
     } finally {
       setLoading(false)
     }
@@ -89,7 +89,7 @@ function Login() {
           </Link>
 
           <h2 className="font-futura-regular text-2xl mb-6 text-center">
-            {isRegister ? "Create Account" : "Login"}
+            {isRegister ? "Đăng ký" : "Đăng nhập"}
           </h2>
 
           {message && (
@@ -108,15 +108,15 @@ function Login() {
           <div className="flex flex-col gap-5">
             {isRegister && (
               <>
-                <Input label="Account" name="account" onChange={handleChange} />
+                <Input label="Tài khoản" name="account" onChange={handleChange} />
                 <Input
-                  label="Password (6–15 characters)"
+                  label="Mật khẩu (6–15 ký tự)"
                   type="password"
                   name="password"
                   onChange={handleChange}
                 />
                 <Input
-                  label="Confirm Password"
+                  label="Xác nhận mật khẩu"
                   type="password"
                   name="confirmPassword"
                   onChange={handleChange}
@@ -125,17 +125,17 @@ function Login() {
             )}
             {isRegister && (
               <>
-                <Input label="Full Name" name="name" onChange={handleChange} />
-                <Input label="Phone Number" name="phone" onChange={handleChange} />
+                <Input label="Tên" name="name" onChange={handleChange} />
+                <Input label="Số điện thoại" name="phone" onChange={handleChange} />
                 <Input label="Email" name="gmail" onChange={handleChange} />
-                <Input label="Address" name="address" onChange={handleChange} />
+                <Input label="Địa chỉ" name="address" onChange={handleChange} />
               </>
             )}
 
             {!isRegister && (
               <>
-                <Input label="Account" name="account" onChange={handleChange} />
-                <Input label="Password" type="password" name="password" onChange={handleChange} />
+                <Input label="Tài khoản" name="account" onChange={handleChange} />
+                <Input label="Mật khẩu" type="password" name="password" onChange={handleChange} />
               </>
             )}
 
@@ -144,7 +144,7 @@ function Login() {
               className="mt-4 bg-blue-400 text-white py-2
                hover:bg-blue-500 transition font-semibold font-futura-regular"
             >
-              {isRegister ? "Register" : "Login"}
+              {isRegister ? "Đăng ký" : "Đăng nhập"}
             </button>
           </div>
 
@@ -152,7 +152,7 @@ function Login() {
           <div className="mt-6 text-center text-sm font-futura-regular">
             {isRegister ? (
               <p>
-                Already have an account?{" "}
+                Bạn đã có tài khoản?{" "}
                 <button
                   onClick={() => {
                     setIsRegister(false)
@@ -160,13 +160,13 @@ function Login() {
                   }}
                   className="text-blue-500 hover:underline"
                 >
-                  Login
+                  Đăng nhập ngay
                 </button>
 
               </p>
             ) : (
               <p>
-                Don’t have an account?{" "}
+                Bạn chưa có tài khoản?{" "}
                 <button
                   onClick={() => {
                     setIsRegister(true)
@@ -174,7 +174,7 @@ function Login() {
                   }}
                   className="text-blue-500 hover:underline"
                 >
-                  Create an account
+                  Đăng ký ngay!
                 </button>
 
               </p>

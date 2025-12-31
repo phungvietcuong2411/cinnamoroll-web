@@ -35,7 +35,7 @@ const statusColor = (status) => {
 /* ================= DATE FORMAT ================= */
 const formatDateVN = (date) => {
   const d = new Date(date)
-  d.setHours(d.getHours() + 7)
+  // d.setHours(d.getHours() + 7)
   return d.toLocaleString("vi-VN")
 }
 
