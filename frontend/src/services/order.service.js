@@ -1,8 +1,8 @@
 import axios from "./Axios/axios"
 
-export const getAllOrders = () => {
-  return axios.get("api/orders");
-};
+export const getAllOrders = (params) => {
+  return axios.get("api/orders", { params })
+}
 
 export const getMyOrders = () => {
   return axios.get("api/orders/my");

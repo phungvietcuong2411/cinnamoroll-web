@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Link , useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import {
   Menu,
   X,
@@ -55,7 +55,17 @@ function Header() {
         <div className="hidden md:flex gap-8">
           <Link to="/home" className="hover:text-blue-700">Trang chủ</Link>
           <Link to="/product" className="hover:text-blue-700">Cửa hàng</Link>
+
+          {user?.role === "admin" && (
+            <Link
+              to="/manage/revenue"
+              className="hover:text-blue-700 font-semibold"
+            >
+              Quản lý
+            </Link>
+          )}
         </div>
+
         {/* LOGO CENTER */}
         <Link
           to="/home"
