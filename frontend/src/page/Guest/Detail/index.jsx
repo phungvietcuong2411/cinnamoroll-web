@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useParams, Link } from "react-router-dom"
 import { Heart, LoaderCircle } from "lucide-react"
 import Header from "../../../components/Header"
@@ -25,11 +25,18 @@ function Detail() {
   const [mainImage, setMainImage] = useState("")
   const [loading, setLoading] = useState(true)
   const [adding, setAdding] = useState(false)
+  const [followLoading, setFollowLoading] = useState(false)
   const [toast, setToast] = useState({
     show: false,
     message: "",
     type: "success"
   })
+
+  // Ref cho danh sách ảnh phụ để xử lý drag
+  const imageListRef = useRef(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [startY, setStartY] = useState(0)
+  const [scrollTop, setScrollTop] = useState(0)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -98,7 +105,10 @@ function Detail() {
   const decrease = () => setQty(prev => (prev > 1 ? prev - 1 : 1))
 
   const toggleFollow = async () => {
+    if (followLoading) return
+
     try {
+      setFollowLoading(true)
       if (liked) {
         await unfollowProduct(product.id)
         setLiked(false)
@@ -108,7 +118,33 @@ function Detail() {
       }
     } catch (err) {
       console.error(err)
+    } finally {
+      setFollowLoading(false)
     }
+  }
+
+  // Xử lý drag cho danh sách ảnh phụ trên desktop
+  const handleMouseDown = (e) => {
+    if (window.innerWidth < 768) return // Chỉ desktop
+    setIsDragging(true)
+    setStartY(e.pageY - imageListRef.current.offsetTop)
+    setScrollTop(imageListRef.current.scrollTop)
+  }
+
+  const handleMouseLeave = () => {
+    setIsDragging(false)
+  }
+
+  const handleMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  const handleMouseMove = (e) => {
+    if (!isDragging || window.innerWidth < 768) return
+    e.preventDefault()
+    const y = e.pageY - imageListRef.current.offsetTop
+    const walk = (y - startY) * 2 // Tốc độ kéo
+    imageListRef.current.scrollTop = scrollTop - walk
   }
 
   if (!product) {
@@ -129,7 +165,7 @@ function Detail() {
     <>
       <Header />
       <div className="h-16" />
-      
+
       <CartNotification
         show={toast.show}
         message={toast.message}
@@ -138,32 +174,48 @@ function Detail() {
       />
 
       <div className="hidden md:flex h-20 items-center font-futura-regular text-sm px-36 mb-8">
-        <Link to="/home">Trang chủ</Link>
+        <Link to="/home" className="cursor-pointer">Trang chủ</Link>
         <span className="mx-2">/</span>
-        <Link to="/product">Cửa hàng</Link>
+        <Link to="/product" className="cursor-pointer">Cửa hàng</Link>
         <span className="mx-2">/</span>
         <span>{product.name}</span>
       </div>
 
       <div className="flex flex-col md:flex-row justify-center gap-8 md:gap-16 px-4 md:px-36">
         <div className="w-full md:w-160">
-          <img
-            src={mainImage}
-            alt={product.name}
-            className="w-full aspect-square object-cover md:h-160 md:w-160 mb-4"
-          />
+          {/* Ảnh chính */}
+          <div className="w-full aspect-square mb-6">
+            <img
+              src={mainImage}
+              alt={product.name}
+              className="w-full h-full object-cover rounded-xl shadow-md"
+            />
+          </div>
 
-          <div className="flex gap-3 overflow-x-auto md:overflow-visible">
+          {/* Ảnh phụ - Desktop: cuộn dọc | Mobile: cuộn ngang */}
+          <div className="
+            flex md:flex gap-3 
+            overflow-x-auto md:overflow-y-auto 
+            scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100
+            pb-2 md:pb-0
+          ">
             {allImages.map((img, i) => (
-              <img
+              <div
                 key={i}
-                src={img}
-                alt=""
                 onClick={() => setMainImage(img)}
-                className={`h-20 w-20 md:h-27 md:w-27 cursor-pointer border flex-shrink-0 ${
-                  mainImage === img ? "border-black" : "border-transparent"
-                }`}
-              />
+                className={`
+                  shrink-0 cursor-pointer transition-all duration-300
+                `}
+              >
+                <img
+                  src={img}
+                  alt={`Ảnh phụ ${i + 1}`}
+                  className="
+                    w-27 object-cover
+                    h-24 md:h-auto
+                  "
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -187,7 +239,7 @@ function Detail() {
 
           <div className="flex flex-wrap items-center gap-4 mb-6">
             <div className="flex border items-center">
-              <button onClick={decrease} className="px-4 py-3 border-r">
+              <button onClick={decrease} className="px-4 py-3 border-r cursor-pointer">
                 -
               </button>
               <input
@@ -201,13 +253,21 @@ function Detail() {
                 }}
                 className="w-20 text-center outline-none font-frankfurter py-2"
               />
-              <button onClick={increase} className="px-4 py-3 border-l">
+              <button onClick={increase} className="px-4 py-3 border-l cursor-pointer">
                 +
               </button>
             </div>
 
-            <button onClick={toggleFollow} className="border p-3">
-              <Heart className={liked ? "fill-red-500 text-red-500" : "text-gray-400"} />
+            <button
+              onClick={toggleFollow}
+              className="border p-3 cursor-pointer flex items-center justify-center"
+              disabled={followLoading}
+            >
+              {followLoading ? (
+                <LoaderCircle className="w-5 h-5 animate-spin text-gray-400" />
+              ) : (
+                <Heart className={liked ? "fill-red-500 text-red-500" : "text-gray-400"} />
+              )}
             </button>
           </div>
 
@@ -215,7 +275,7 @@ function Detail() {
             <button
               onClick={handleAddToCart}
               disabled={adding}
-              className="w-full border py-3 font-futura-regular transition flex items-center justify-center gap-2"
+              className="w-full border py-3 font-futura-regular transition flex items-center justify-center gap-2 cursor-pointer hover:bg-gray-100"
             >
               {adding ? (
                 <>
@@ -237,8 +297,8 @@ function Detail() {
 
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-6">
           {relatedProducts.map(p => (
-            <Link key={p.id} to={`/product/detail/${p.id}`}>
-              <div className="bg-[#f7f7f7] p-3">
+            <Link key={p.id} to={`/product/detail/${p.id}`} className="cursor-pointer">
+              <div className="bg-[#f7f7f7] p-3 md:h-75 flex flex-col justify-between">
                 <img
                   src={p.imgMain}
                   alt={p.name}

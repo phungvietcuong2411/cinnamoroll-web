@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import AdminLayout from "../../../layouts/AdminLayout"
-import { Search, ArrowUpDown, Plus } from "lucide-react"
+import { Search, ArrowUpDown, Plus , ChevronLeft, ChevronRight} from "lucide-react"
 import { getAllProducts } from "../../../services/product.service"
 
 
@@ -10,20 +10,28 @@ function ProductManagement() {
     const [keyword, setKeyword] = useState("")
     const [sortField, setSortField] = useState(null)
     const [sortOrder, setSortOrder] = useState("asc")
+    const [page, setPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1)
+    const LIMIT = 10
 
     /* ===================== FETCH DATA ===================== */
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const res = await getAllProducts()
-                setProducts(res.data) // nếu backend trả { data: [] } → res.data.data
+                const res = await getAllProducts({
+                    page,
+                    limit: LIMIT
+                })
+
+                setProducts(res.data.products || [])
+                setTotalPages(res.data.pagination?.totalPages || 1)
             } catch (error) {
                 console.error("Lỗi lấy sản phẩm:", error)
             }
         }
 
         fetchProducts()
-    }, [])
+    }, [page])
 
     /* ===================== SORT ===================== */
     const handleSort = (field) => {
@@ -154,7 +162,9 @@ function ProductManagement() {
                                     key={product.id}
                                     className="border-t hover:bg-gray-50"
                                 >
-                                    <td className="p-3">{index + 1}</td>
+                                    <td className="p-3">
+                                        {(page - 1) * LIMIT + index + 1}
+                                    </td>
 
                                     <td className="p-3">
                                         <img
@@ -206,6 +216,127 @@ function ProductManagement() {
                             )}
                         </tbody>
                     </table>
+                    {totalPages > 1 && (
+                        <div className="flex justify-end items-center gap-4 mt-6 px-2">
+                            <nav className="flex items-center gap-2">
+
+                                {/* Nút Trước (<) */}
+                                <button
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    disabled={page === 1}
+                                    className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    aria-label="Trang trước"
+                                >
+                                    <ChevronLeft size={18} />
+                                </button>
+
+                                {/* Các số trang - hiển thị thông minh */}
+                                {(() => {
+                                    const pages = [];
+                                    const maxVisible = 5; // Số nút trang tối đa hiển thị
+                                    let start = Math.max(1, page - Math.floor(maxVisible / 2));
+                                    let end = Math.min(totalPages, start + maxVisible - 1);
+
+                                    // Điều chỉnh để luôn có đủ số lượng nút
+                                    if (end - start + 1 < maxVisible) {
+                                        start = Math.max(1, end - maxVisible + 1);
+                                    }
+
+                                    // Trang 1
+                                    if (start > 1) {
+                                        pages.push(
+                                            <button
+                                                key={1}
+                                                onClick={() => setPage(1)}
+                                                className="w-9 h-9 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-50 transition-all"
+                                            >
+                                                1
+                                            </button>
+                                        );
+                                        if (start > 2) {
+                                            pages.push(<span key="start-dots" className="text-gray-400 px-1">...</span>);
+                                        }
+                                    }
+
+                                    // Các trang giữa
+                                    for (let i = start; i <= end; i++) {
+                                        pages.push(
+                                            <button
+                                                key={i}
+                                                onClick={() => setPage(i)}
+                                                className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${page === i
+                                                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                                                        : "border border-gray-300 hover:bg-gray-50 text-gray-700"
+                                                    }`}
+                                            >
+                                                {i}
+                                            </button>
+                                        );
+                                    }
+
+                                    // Trang cuối
+                                    if (end < totalPages) {
+                                        if (end < totalPages - 1) {
+                                            pages.push(<span key="end-dots" className="text-gray-400 px-1">...</span>);
+                                        }
+                                        pages.push(
+                                            <button
+                                                key={totalPages}
+                                                onClick={() => setPage(totalPages)}
+                                                className="w-9 h-9 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-50 transition-all"
+                                            >
+                                                {totalPages}
+                                            </button>
+                                        );
+                                    }
+
+                                    return pages;
+                                })()}
+
+                                {/* Nút Sau (>) */}
+                                <button
+                                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={page === totalPages}
+                                    className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    aria-label="Trang sau"
+                                >
+                                    <ChevronRight size={18} />
+                                </button>
+
+                                {/* Ô nhập trang */}
+                                <div className="flex items-center gap-2 ml-3 text-sm">
+                                    <span className="text-gray-500 hidden sm:inline">Đi tới</span>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max={totalPages}
+                                        value={page}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            if (val === "") return;
+                                            const num = parseInt(val, 10);
+                                            if (!isNaN(num) && num >= 1 && num <= totalPages) {
+                                                setPage(num);
+                                            }
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                const val = parseInt(e.target.value, 10);
+                                                if (val >= 1 && val <= totalPages) {
+                                                    setPage(val);
+                                                }
+                                            }
+                                        }}
+                                        className="w-16 px-2 py-1.5 text-center border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:hidden [&::-webkit-inner-spin-button]:hidden"
+                                        placeholder={page}
+                                    />
+                                    <span className="text-gray-500">/ {totalPages}</span>
+                                </div>
+
+                            </nav>
+                        </div>
+                    )}
+
                 </div>
             </div>
         </AdminLayout>

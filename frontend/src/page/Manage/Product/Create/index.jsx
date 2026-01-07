@@ -2,12 +2,13 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import AdminLayout from "../../../../layouts/AdminLayout"
 import { createProduct } from "../../../../services/product.service"
-import { getAllTypes } from "../../../../services/type.service"
-import { createType } from "../../../../services/type.service" // Giả sử bạn import từ đây
+import { getAllTypes, createType } from "../../../../services/type.service"
 import { Save, ArrowLeft, X, Upload, Image as ImageIcon, Loader2, Plus } from "lucide-react"
+import { useToast } from "../../../../components/Notification"  // ← Thêm import này
 
 function CreateProduct() {
     const navigate = useNavigate()
+    const { addToast } = useToast()  // ← Khởi tạo toast
 
     const [types, setTypes] = useState([])
     const [typesLoading, setTypesLoading] = useState(false)
@@ -53,23 +54,31 @@ function CreateProduct() {
     /* ===================== CREATE NEW TYPE ===================== */
     const handleCreateType = async () => {
         if (!newTypeName.trim()) {
-            alert("Vui lòng nhập tên loại mới!")
+            addToast("Vui lòng nhập tên loại mới!", "warning")
             return
         }
         setCreatingType(true)
         try {
             await createType({ nameType: newTypeName.trim() })
-            alert("✅ Thêm loại sản phẩm thành công!")
+            addToast("Thêm loại sản phẩm thành công!", "success")
+
             // Reload types
             const res = await getAllTypes()
-            setTypes(Array.isArray(res.data) ? res.data : res.data?.data || [])
-            // Chọn loại mới vừa tạo (giả sử backend trả id)
-            const newType = res.data.find(t => t.nameType === newTypeName.trim())
-            if (newType) setForm(prev => ({ ...prev, idType: newType.id }))
+            const updatedTypes = Array.isArray(res.data) ? res.data : res.data?.data || []
+            setTypes(updatedTypes)
+
+            // Tự động chọn loại mới vừa tạo
+            const newType = updatedTypes.find(t => t.nameType.toLowerCase() === newTypeName.trim().toLowerCase())
+            if (newType) {
+                setForm(prev => ({ ...prev, idType: newType.id }))
+            }
+
             setNewTypeName("")
+            // Có thể đóng modal nếu muốn, hoặc giữ mở để chọn tiếp
         } catch (err) {
             console.error(err)
-            alert("❌ Thêm loại thất bại: " + (err.response?.data?.message || err.message))
+            const msg = err.response?.data?.message || "Thêm loại thất bại"
+            addToast(msg, "error")
         } finally {
             setCreatingType(false)
         }
@@ -112,32 +121,41 @@ function CreateProduct() {
     /* ===================== SUBMIT ===================== */
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!form.name || !form.price || !form.idType || !imgMain) {
-            alert("Vui lòng nhập đủ: tên, giá, loại và ảnh chính!")
+
+        if (!form.name.trim()) {
+            addToast("Vui lòng nhập tên sản phẩm", "warning")
             return
         }
+        if (!form.price || Number(form.price) < 0) {
+            addToast("Vui lòng nhập giá hợp lệ", "warning")
+            return
+        }
+        if (!form.idType) {
+            addToast("Vui lòng chọn loại sản phẩm", "warning")
+            return
+        }
+        if (!imgMain) {
+            addToast("Vui lòng tải lên ảnh chính", "warning")
+            return
+        }
+
         const formData = new FormData()
-        formData.append("name", form.name)
+        formData.append("name", form.name.trim())
         formData.append("price", form.price)
         formData.append("quantity", form.quantity || 0)
         formData.append("idType", form.idType)
         formData.append("imgMain", imgMain)
         images.forEach(file => formData.append("images", file))
 
-        // Debug
-        console.log("===== FORM DATA SEND =====")
-        for (let [key, value] of formData.entries()) {
-            console.log(key, value)
-        }
-
         try {
             setLoading(true)
             await createProduct(formData)
-            alert("✅ Thêm sản phẩm thành công!")
+            addToast("Thêm sản phẩm thành công!", "success")
             navigate("/manage/products")
         } catch (err) {
             console.error("CREATE PRODUCT ERROR:", err.response?.data || err)
-            alert("❌ Thêm sản phẩm thất bại!")
+            const msg = err.response?.data?.message || "Thêm sản phẩm thất bại"
+            addToast(msg, "error")
         } finally {
             setLoading(false)
         }
@@ -171,7 +189,6 @@ function CreateProduct() {
                                     onChange={handleChange}
                                     placeholder="Nhập tên sản phẩm"
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                    required
                                 />
                             </div>
 
@@ -188,7 +205,6 @@ function CreateProduct() {
                                         placeholder="0"
                                         min="0"
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        required
                                     />
                                 </div>
                                 <div>
@@ -207,7 +223,7 @@ function CreateProduct() {
                                 </div>
                             </div>
 
-                            {/* Loại sản phẩm - Trigger modal */}
+                            {/* Loại sản phẩm */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Loại sản phẩm <span className="text-red-500">*</span>
@@ -282,7 +298,7 @@ function CreateProduct() {
 
                 {/* MODAL CHỌN LOẠI SẢN PHẨM */}
                 {showTypeModal && (
-                    <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                         <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
                             <button onClick={() => setShowTypeModal(false)} className="absolute top-3 right-3 text-gray-500 hover:text-gray-800">
                                 <X size={24} />

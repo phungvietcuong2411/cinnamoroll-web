@@ -1,7 +1,13 @@
 import axios from "./Axios/axios"
 
-export const getAllUsers = () => {
-  return axios.get("api/users")
+export const getAllUsers = ({ page, limit, search }) => {
+  return axios.get("/api/users", {
+    params: {
+      page,
+      limit,
+      search
+    }
+  })
 }
 
 export const getUserById = (id) => {
