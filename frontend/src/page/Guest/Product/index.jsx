@@ -306,17 +306,16 @@ function Product() {
           </section>
         </div>
 
-        {/* Pagination - Chuẩn như Admin */}
         {totalPages > 1 && (
-          <div className="mt-12 mb-8">
-            <nav className="flex flex-col items-center gap-6">
+          <div className="mt-12 mb-8 font-frankfurter">
+            <nav className="flex items-center justify-center gap-6">
               {/* Các nút trang */}
               <div className="flex items-center gap-2">
                 {/* Prev */}
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="w-10 h-10 flex items-center justify-center border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   aria-label="Trang trước"
                 >
                   <ChevronLeft size={18} />
@@ -359,7 +358,7 @@ function Product() {
                       <button
                         key={i}
                         onClick={() => setPage(i)}
-                        className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${
+                        className={`w-10 h-10 text-sm font-medium transition-all ${
                           page === i
                             ? "bg-blue-600 text-white border-blue-600 shadow-sm"
                             : "border border-gray-300 hover:bg-gray-50 text-gray-700"
@@ -397,17 +396,15 @@ function Product() {
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="w-10 h-10 flex items-center justify-center border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   aria-label="Trang sau"
                 >
                   <ChevronRight size={18} />
                 </button>
               </div>
 
-              {/* Đi tới trang + thông tin */}
               <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
-                  <span>Đi tới</span>
                   <input
                     type="number"
                     min="1"
@@ -429,13 +426,12 @@ function Product() {
                         }
                       }
                     }}
-                    className="w-16 px-3 py-1.5 text-center border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:hidden [&::-webkit-inner-spin-button]:hidden"
+                    className="w-16 h-10 px-3 py-2.5 text-center border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:hidden [&::-webkit-inner-spin-button]:hidden"
                   />
-                  <span>/ {totalPages}</span>
                 </div>
 
                 <span className="hidden sm:inline">
-                  Trang <strong>{page}</strong> của <strong>{totalPages}</strong>
+                  Trang <strong>{page}</strong> / <strong>{totalPages}</strong>
                 </span>
               </div>
             </nav>

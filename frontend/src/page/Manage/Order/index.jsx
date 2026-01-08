@@ -38,7 +38,10 @@ const STATUS_FLOW = {
 }
 
 const formatDateTime = (date) =>
-  new Date(date).toLocaleString("vi-VN", { hour12: false })
+  new Date(date).toLocaleString("vi-VN", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    hour12: false,
+  })
 
 /* ================== COMPONENT ================== */
 

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import AdminRoute from "./routes/AdminRoute"
 
 // Guest pages
 import Home from "./page/Guest/Home"
@@ -42,13 +43,13 @@ function App() {
         <Route path="/setting" element={<Setting />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-failed" element={<PaymentFailed />} />
-        <Route path="/manage/guest" element={<GuestManagement />} />
-        <Route path="/manage/types" element={<TypeManagement />} />
-        <Route path="/manage/orders" element={<OrderManagement />} />
-        <Route path="/manage/products" element={<ProductManagement />} />
-        <Route path="/manage/products/:id" element={<ProductDetailManagement />} />
-        <Route path="/manage/revenue" element={<RevenueManagement />} />
-        <Route path="/manage/products/create" element={<CreateProduct />} />
+        <Route path="/manage/guest" element={<AdminRoute><GuestManagement /></AdminRoute>} />
+        <Route path="/manage/types" element={<AdminRoute><TypeManagement /></AdminRoute>} />
+        <Route path="/manage/orders" element={<AdminRoute><OrderManagement /></AdminRoute>} />
+        <Route path="/manage/products" element={<AdminRoute><ProductManagement /></AdminRoute>} />
+        <Route path="/manage/products/create" element={<AdminRoute><CreateProduct /></AdminRoute>} />
+        <Route path="/manage/products/:id" element={<AdminRoute><ProductDetailManagement /></AdminRoute>} />
+        <Route path="/manage/revenue" element={<AdminRoute><RevenueManagement /></AdminRoute>} />
 
         {/* User */}
         <Route path="/cart" element={<Cart />} />

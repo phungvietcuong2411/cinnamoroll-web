@@ -28,7 +28,11 @@ const statusColor = (status) => {
   }
 }
 
-const formatDateVN = (date) => new Date(date).toLocaleString("vi-VN")
+const formatDateVN = (date) =>
+  new Date(date).toLocaleString("vi-VN", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    hour12: false,
+  })
 
 function Order() {
   const [orders, setOrders] = useState([])
