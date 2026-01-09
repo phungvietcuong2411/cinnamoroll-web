@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import AdminLayout from "../../../layouts/AdminLayout"
-import { Search, ArrowUpDown, Plus , ChevronLeft, ChevronRight} from "lucide-react"
+import { Search, ArrowUpDown, Plus, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import { getAllProducts } from "../../../services/product.service"
 
 
@@ -12,12 +12,16 @@ function ProductManagement() {
     const [sortOrder, setSortOrder] = useState("asc")
     const [page, setPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
+    const [loading, setLoading] = useState(false)
     const LIMIT = 10
 
     /* ===================== FETCH DATA ===================== */
     useEffect(() => {
         const fetchProducts = async () => {
             try {
+                setLoading(true)
+                setProducts([])
+
                 const res = await getAllProducts({
                     page,
                     limit: LIMIT
@@ -27,11 +31,14 @@ function ProductManagement() {
                 setTotalPages(res.data.pagination?.totalPages || 1)
             } catch (error) {
                 console.error("Lỗi lấy sản phẩm:", error)
+            } finally {
+                setLoading(false)
             }
         }
 
         fetchProducts()
     }, [page])
+
 
     /* ===================== SORT ===================== */
     const handleSort = (field) => {
@@ -157,7 +164,17 @@ function ProductManagement() {
                         </thead>
 
                         <tbody>
-                            {filteredProducts.map((product, index) => (
+                            {loading && (
+                                <tr>
+                                    <td colSpan="7" className="p-6 text-center">
+                                        <div className="flex justify-center items-center gap-2 text-gray-500">
+                                            <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                                            <span>Đang tải dữ liệu...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
+                            {!loading && filteredProducts.map((product, index) => (
                                 <tr
                                     key={product.id}
                                     className="border-t hover:bg-gray-50"
@@ -204,7 +221,7 @@ function ProductManagement() {
                                 </tr>
                             ))}
 
-                            {filteredProducts.length === 0 && (
+                            {!loading && filteredProducts.length === 0 && (
                                 <tr>
                                     <td
                                         colSpan="7"
@@ -217,14 +234,14 @@ function ProductManagement() {
                         </tbody>
                     </table>
                     {totalPages > 1 && (
-                        <div className="flex justify-end items-center gap-4 mt-6 px-2">
+                        <div className="flex justify-end items-center gap-4 py-8 px-2 border-t ">
                             <nav className="flex items-center gap-2">
 
                                 {/* Nút Trước (<) */}
                                 <button
                                     onClick={() => setPage(p => Math.max(1, p - 1))}
                                     disabled={page === 1}
-                                    className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    className="w-9 h-9 flex items-center justify-center border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                     aria-label="Trang trước"
                                 >
                                     <ChevronLeft size={18} />
@@ -248,7 +265,7 @@ function ProductManagement() {
                                             <button
                                                 key={1}
                                                 onClick={() => setPage(1)}
-                                                className="w-9 h-9 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-50 transition-all"
+                                                className="w-9 h-9 border border-gray-300 text-sm font-medium hover:bg-gray-50 transition-all"
                                             >
                                                 1
                                             </button>
@@ -264,9 +281,9 @@ function ProductManagement() {
                                             <button
                                                 key={i}
                                                 onClick={() => setPage(i)}
-                                                className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${page === i
-                                                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
-                                                        : "border border-gray-300 hover:bg-gray-50 text-gray-700"
+                                                className={`w-9 h-9 text-sm font-medium transition-all ${page === i
+                                                    ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                                                    : "border border-gray-300 hover:bg-gray-50 text-gray-700"
                                                     }`}
                                             >
                                                 {i}
@@ -283,7 +300,7 @@ function ProductManagement() {
                                             <button
                                                 key={totalPages}
                                                 onClick={() => setPage(totalPages)}
-                                                className="w-9 h-9 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-50 transition-all"
+                                                className="w-9 h-9 border border-gray-300 text-sm font-medium hover:bg-gray-50 transition-all"
                                             >
                                                 {totalPages}
                                             </button>
@@ -297,7 +314,7 @@ function ProductManagement() {
                                 <button
                                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                                     disabled={page === totalPages}
-                                    className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    className="w-9 h-9 flex items-center justify-center border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                     aria-label="Trang sau"
                                 >
                                     <ChevronRight size={18} />
@@ -327,7 +344,7 @@ function ProductManagement() {
                                                 }
                                             }
                                         }}
-                                        className="w-16 px-2 py-1.5 text-center border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:hidden [&::-webkit-inner-spin-button]:hidden"
+                                        className="w-16 px-2 py-1.5 text-center border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:hidden [&::-webkit-inner-spin-button]:hidden"
                                         placeholder={page}
                                     />
                                     <span className="text-gray-500">/ {totalPages}</span>

@@ -188,7 +188,7 @@ function Detail() {
             <img
               src={mainImage}
               alt={product.name}
-              className="w-full h-full object-cover rounded-xl shadow-md"
+              className="w-full h-full object-cover"
             />
           </div>
 

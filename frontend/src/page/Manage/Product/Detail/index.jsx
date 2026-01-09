@@ -6,7 +6,7 @@ import {
   getImagesByProduct,
   deleteProduct
 } from "../../../../services/product.service"
-import { ArrowLeft, Trash2 } from "lucide-react"
+import { ArrowLeft, Trash2, Pencil } from "lucide-react"
 
 function ProductDetailManagement() {
   const { id } = useParams()
@@ -42,7 +42,7 @@ function ProductDetailManagement() {
     try {
       await deleteProduct(id)
       alert("Xóa sản phẩm thành công")
-      navigate("/admin/products")
+      navigate("/manage/products")
     } catch (error) {
       console.error("Lỗi xóa sản phẩm:", error)
     }
@@ -79,14 +79,28 @@ function ProductDetailManagement() {
             <h1 className="text-2xl font-bold">Chi tiết sản phẩm</h1>
           </div>
 
-          <button
-            onClick={handleDelete}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          >
-            <Trash2 size={18} />
-            Xóa sản phẩm
-          </button>
+          {/* ACTION BUTTONS */}
+          <div className="flex items-center gap-3">
+            {/* EDIT */}
+            <button
+              onClick={() => navigate(`/manage/products/${id}/edit`)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              <Pencil size={18} />
+              Chỉnh sửa
+            </button>
+
+            {/* DELETE */}
+            <button
+              onClick={handleDelete}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              <Trash2 size={18} />
+              Xóa sản phẩm
+            </button>
+          </div>
         </div>
+
 
         {/* Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

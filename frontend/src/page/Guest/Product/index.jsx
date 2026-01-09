@@ -266,24 +266,24 @@ function Product() {
                     <Link
                       key={product.id}
                       to={`/product/detail/${product.id}`}
-                      className="group relative bg-[#f7f7f7] overflow-hidden flex flex-col rounded-lg"
+                      className="group relative bg-[#f7f7f7] overflow-hidden flex flex-col"
                     >
-                      <div className="aspect-square relative">
+                      <div className="aspect-square relative flex items-center justify-center">
                         <img
                           src={product.imgMain}
                           alt={product.name}
-                          className="w-full h-full object-cover rounded-lg"
+                          className="w-[95%] h-[95%] object-cover"
                         />
 
                         {/* Thumbnail nhỏ khi hover (desktop) */}
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3">
+                        <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/50 to-transparent opacity-0 transition-opacity p-3">
                           <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                             {allImages.slice(1).map((img, idx) => (
                               <img
                                 key={idx}
                                 src={img}
                                 alt=""
-                                className="w-12 h-12 object-cover rounded border-2 border-white flex-shrink-0"
+                                className="w-12 h-12 object-cover rounded border-2 border-white shrink-0"
                               />
                             ))}
                           </div>
@@ -294,7 +294,7 @@ function Product() {
                         <p className="font-futura-regular text-sm line-clamp-2 my-2">
                           {product.name}
                         </p>
-                        <p className="font-frankfurter text-sm text-center bg-white border py-2 rounded">
+                        <p className="font-frankfurter text-sm text-center bg-white border py-2">
                           {Number(product.price).toLocaleString("vi-VN")} VND
                         </p>
                       </div>

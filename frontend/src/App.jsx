@@ -19,6 +19,7 @@ import ProductManagement from "./page/Manage/Product"
 import ProductDetailManagement from "./page/Manage/Product/Detail"
 import RevenueManagement from "./page/Manage/Revenue"
 import CreateProduct from "./page/Manage/Product/Create"
+import ProductEditManagement from "./page/Manage/Product/Edit"
 // import Support from "./page/Guest/Support"
 // import Sale from "./page/Guest/Sale"
 // import Cart from "./page/User/Cart"
@@ -50,7 +51,7 @@ function App() {
         <Route path="/manage/products/create" element={<AdminRoute><CreateProduct /></AdminRoute>} />
         <Route path="/manage/products/:id" element={<AdminRoute><ProductDetailManagement /></AdminRoute>} />
         <Route path="/manage/revenue" element={<AdminRoute><RevenueManagement /></AdminRoute>} />
-
+        <Route path="/manage/products/:id/edit" element={<AdminRoute><ProductEditManagement /></AdminRoute>} />
         {/* User */}
         <Route path="/cart" element={<Cart />} />
         {/* <Route path="/follows" element={<Follows />} /> */}
