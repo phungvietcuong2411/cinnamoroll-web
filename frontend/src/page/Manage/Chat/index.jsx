@@ -226,10 +226,9 @@ function Chat() {
                 key={conv.id}
                 onClick={() => selectConversation(conv)}
                 className={`w-full text-left px-4 py-4 border-b transition-colors
-                  ${
-                    selectedConversation?.id === conv.id
-                      ? "bg-blue-50 text-blue-600"
-                      : "hover:bg-gray-100"
+                  ${selectedConversation?.id === conv.id
+                    ? "bg-blue-50 text-blue-600"
+                    : "hover:bg-gray-100"
                   }`}
               >
                 <div className="font-medium">{conv.name || "Khách hàng"}</div>
@@ -264,9 +263,9 @@ function Chat() {
                 const isMe = msg.sender_id === ADMIN_ID;
                 const time = msg.createdAt
                   ? msg.createdAt.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
                   : "";
 
                 return (
@@ -276,26 +275,29 @@ function Chat() {
                   >
                     <div
                       className={`max-w-[75%] px-4 py-2.5 rounded-2xl shadow-sm relative
-                        ${
-                          isMe
-                            ? "bg-blue-600 text-white rounded-br-none"
-                            : "bg-white text-gray-900 rounded-bl-none border border-gray-200"
+    break-words whitespace-pre-wrap
+    ${isMe
+                          ? "bg-blue-600 text-white rounded-br-none"
+                          : "bg-white text-gray-900 rounded-bl-none border border-gray-200"
                         }`}
                     >
                       {msg.content}
+
                       {msg.isSending && (
                         <Loader2
                           size={14}
                           className="absolute -bottom-1 -right-1 text-white animate-spin"
                         />
                       )}
+
                       <span
                         className={`text-xs mt-1 block opacity-70 text-right
-                          ${isMe ? "text-blue-100" : "text-gray-500"}`}
+      ${isMe ? "text-blue-100" : "text-gray-500"}`}
                       >
                         {time}
                       </span>
                     </div>
+
                   </div>
                 );
               })
@@ -325,10 +327,9 @@ function Chat() {
                 onClick={handleSend}
                 disabled={sending || !text.trim()}
                 className={`p-3 rounded-full transition-all duration-200
-                  ${
-                    sending || !text.trim()
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-blue-600 text-white hover:bg-blue-700 active:scale-95"
+                  ${sending || !text.trim()
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 active:scale-95"
                   }`}
               >
                 {sending ? (

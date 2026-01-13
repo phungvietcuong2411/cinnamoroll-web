@@ -171,7 +171,7 @@ export default function ChatWidget() {
       {/* Chat window */}
       {open && (
         <div
-          className="fixed bottom-24 right-6 z-50 w-96 h-[520px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200"
+          className="fixed bottom-24 right-6 z-50 w-96 h-[520px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 font-futura-regular"
           style={{ maxHeight: "calc(100vh - 120px)" }}
         >
           {/* Header */}
@@ -209,28 +209,32 @@ export default function ChatWidget() {
                   key={msg.id}
                   className={`flex ${isMe ? "justify-end" : "justify-start"} group`}
                 >
-                  <div
-                    className={`max-w-[75%] px-4 py-2.5 rounded-2xl shadow-sm relative
-                      ${
-                        isMe
-                          ? "bg-blue-600 text-white rounded-br-none"
-                          : "bg-white text-gray-900 rounded-bl-none border"
-                      }`}
-                  >
-                    {msg.content}
-                    {msg.isSending && (
-                      <Loader2
-                        size={14}
-                        className="absolute -bottom-1 -right-1 text-white animate-spin"
-                      />
-                    )}
-                    <span
-                      className={`text-xs mt-1 block opacity-70 text-right
-                        ${isMe ? "text-blue-100" : "text-gray-500"}`}
-                    >
-                      {time}
-                    </span>
-                  </div>
+<div
+  className={`max-w-[75%] px-4 py-2.5 rounded-2xl shadow-sm relative
+    break-words whitespace-pre-wrap
+    ${
+      isMe
+        ? "bg-blue-600 text-white rounded-br-none"
+        : "bg-white text-gray-900 rounded-bl-none border"
+    }`}
+>
+  {msg.content}
+
+  {msg.isSending && (
+    <Loader2
+      size={14}
+      className="absolute -bottom-1 -right-1 text-white animate-spin"
+    />
+  )}
+
+  <span
+    className={`text-xs mt-1 block opacity-70 text-right
+      ${isMe ? "text-blue-100" : "text-gray-500"}`}
+  >
+    {time}
+  </span>
+</div>
+
                 </div>
               );
             })}
