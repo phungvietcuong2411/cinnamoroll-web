@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import AdminLayout from "../../../layouts/AdminLayout"
 import {
     getTotalRevenue,
     getTodayRevenue,
@@ -149,7 +148,6 @@ const prepareChartData = (apiData, dateList) => {
     }, [endDate])
 
     return (
-        <AdminLayout>
             <div className="p-6 bg-gray-100 min-h-screen font-futura-regular">
                 <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
                     <BarChart3 /> Quản lý doanh thu
@@ -287,7 +285,6 @@ const prepareChartData = (apiData, dateList) => {
                     </table>
                 </div>
             </div>
-        </AdminLayout>
     )
 }
 

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import AdminLayout from "../../../layouts/AdminLayout"
 import {
   Search,
   Eye,
@@ -117,7 +116,6 @@ function OrderManagement() {
   /* ================== RENDER ================== */
 
   return (
-    <AdminLayout>
       <div className="p-6 bg-gray-100 min-h-screen font-futura-regular">
         {/* HEADER */}
         <div className="mb-6">
@@ -402,7 +400,6 @@ function OrderManagement() {
           )}
         </div>
       </div>
-    </AdminLayout>
   )
 }
 

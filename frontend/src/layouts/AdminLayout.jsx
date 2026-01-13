@@ -1,7 +1,8 @@
 import { useState } from "react"
+import { Outlet } from "react-router-dom" 
 import Sidebar from "../components/Sidebar"
 
-function AdminLayout({ children }) {
+function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
@@ -14,7 +15,7 @@ function AdminLayout({ children }) {
           ${collapsed ? "ml-14" : "ml-64"}
         `}
       >
-        {children}
+        <Outlet /> 
       </main>
     </>
   )

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
-import AdminLayout from "../../../layouts/AdminLayout"
 import { Search, ArrowUpDown, Plus, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import { getAllProducts } from "../../../services/product.service"
 
@@ -81,7 +80,6 @@ function ProductManagement() {
 
     /* ===================== UI ===================== */
     return (
-        <AdminLayout>
             <div className="p-6 bg-gray-100 min-h-screen font-futura-regular">
                 {/* Header */}
                 <div className="mb-6 flex items-center justify-between">
@@ -356,7 +354,6 @@ function ProductManagement() {
 
                 </div>
             </div>
-        </AdminLayout>
     )
 }
 

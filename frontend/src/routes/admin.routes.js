@@ -4,4 +4,5 @@ export const ADMIN_ROUTES = {
   TYPES: "/manage/types",
   ORDERS: "/manage/orders",
   REVENUE: "/manage/revenue",
+  CHAT: "/manage/chat",
 }

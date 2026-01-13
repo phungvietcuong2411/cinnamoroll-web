@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import AdminLayout from "../../../../layouts/AdminLayout"
 import {
   getProductById,
   getImagesByProduct,
@@ -50,22 +49,17 @@ function ProductDetailManagement() {
 
   if (loading) {
     return (
-      <AdminLayout>
         <div className="p-6">Đang tải dữ liệu...</div>
-      </AdminLayout>
     )
   }
 
   if (!product) {
     return (
-      <AdminLayout>
         <div className="p-6 text-red-500">Không tìm thấy sản phẩm</div>
-      </AdminLayout>
     )
   }
 
   return (
-    <AdminLayout>
       <div className="p-6 bg-gray-100 min-h-screen font-futura-regular">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -166,7 +160,6 @@ function ProductDetailManagement() {
           </div>
         </div>
       </div>
-    </AdminLayout>
   )
 }
 

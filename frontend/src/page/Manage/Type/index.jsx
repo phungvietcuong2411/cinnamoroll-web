@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import AdminLayout from "../../../layouts/AdminLayout"
 import { Search, Plus, Pencil, Trash2, X } from "lucide-react"
 import {
   getAllTypes,
@@ -121,7 +120,7 @@ function TypeManagement() {
 
   // ================= RENDER =================
   return (
-    <AdminLayout>
+    <>
       <div className="p-6 bg-gray-100 min-h-screen font-futura-regular">
         {/* Header */}
         <div className="mb-6">
@@ -277,7 +276,7 @@ function TypeManagement() {
           </div>
         </div>
       )}
-    </AdminLayout>
+    </>
   )
 }
 

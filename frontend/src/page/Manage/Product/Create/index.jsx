@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import AdminLayout from "../../../../layouts/AdminLayout"
 import { createProduct } from "../../../../services/product.service"
 import { getAllTypes, createType } from "../../../../services/type.service"
 import { Save, ArrowLeft, X, Upload, Image as ImageIcon, Loader2, Plus } from "lucide-react"
@@ -162,7 +161,6 @@ function CreateProduct() {
     }
 
     return (
-        <AdminLayout>
             <div className="p-6 bg-gray-50 min-h-screen font-futura-regular">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
@@ -357,7 +355,6 @@ function CreateProduct() {
                     </div>
                 )}
             </div>
-        </AdminLayout>
     )
 }
 

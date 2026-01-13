@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import AdminLayout from "../../../../layouts/AdminLayout"
 import {
     getProductById,
     updateProduct,
@@ -235,16 +234,13 @@ function ProductEditManagement() {
 
     if (loadingPage) {
         return (
-            <AdminLayout>
                 <div className="p-6 flex items-center justify-center min-h-screen">
                     <Loader2 className="animate-spin" size={48} />
                 </div>
-            </AdminLayout>
         )
     }
 
     return (
-        <AdminLayout>
             <div className="p-6 bg-gray-50 min-h-screen font-futura-regular">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
@@ -458,7 +454,6 @@ function ProductEditManagement() {
                     </div>
                 )}
             </div>
-        </AdminLayout>
     )
 }
 

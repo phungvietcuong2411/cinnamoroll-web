@@ -11,6 +11,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Users,
+  MessageCircle
 } from "lucide-react"
 import { useState } from "react"
 import { ADMIN_ROUTES } from "../../routes/admin.routes"
@@ -127,7 +128,26 @@ function Sidebar({ onCollapseChange }) {
           <BarChart3 size={18} />
           {!collapsed && <span>Doanh thu</span>}
         </Link>
+        {/* Chat */}
+        <Link
+          to={ADMIN_ROUTES.CHAT}
+          className={linkClass(isActive(ADMIN_ROUTES.CHAT))}
+        >
+          <MessageCircle size={18} />
+          {!collapsed && (
+            <div className="flex items-center justify-between w-full">
+              <span>Tin nhắn</span>
+
+              {/* Badge unread (mock) */}
+              <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                3
+              </span>
+            </div>
+          )}
+        </Link>
+
       </nav>
+
 
       {/* Footer */}
       <div className="p-2 border-t border-gray-700 space-y-1">
