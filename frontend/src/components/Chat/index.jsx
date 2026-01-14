@@ -14,7 +14,8 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
-  const [pendingMsgId, setPendingMsgId] = useState(null); // Track pending optimistic msg
+  const [pendingMsgId, setPendingMsgId] = useState(null);
+
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -31,25 +32,17 @@ export default function ChatWidget() {
   const currentUserId = currentUser?.id;
   const currentUserRole = currentUser?.role;
 
-  // Admin không dùng widget này
   if (currentUserRole === "admin") return null;
 
-  // Auto scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Connect socket once
   useEffect(() => {
-    if (!socket.connected) {
-      socket.connect();
-    }
-    return () => {
-      socket.off("receive_message");
-    };
+    if (!socket.connected) socket.connect();
+    return () => socket.off("receive_message");
   }, []);
 
-  // Init conversation khi mở chat
   useEffect(() => {
     if (!open || !currentUserId || conversationId) return;
 
@@ -67,52 +60,43 @@ export default function ChatWidget() {
           }))
         );
       } catch (err) {
-        console.error("Chat init error:", err);
+        console.error("Lỗi khởi tạo chat:", err);
       }
     };
 
     initChat();
   }, [open, currentUserId, conversationId]);
 
-  // Join room & listen realtime messages
   useEffect(() => {
     if (!open || !conversationId) return;
 
     socket.emit("join_conversation", conversationId);
 
-    const handleReceive = (msg) => {
-      const normalized = {
+    const handleReceiveMessage = (msg) => {
+      const normalizedMsg = {
         ...msg,
         sender_id: Number(msg.sender_id),
         createdAt: msg.createdAt ? new Date(msg.createdAt) : new Date(),
       };
 
       setMessages((prev) => {
-        // Nếu có pendingMsgId và msg này từ user (vừa gửi), thay thế optimistic
-        if (pendingMsgId && normalized.sender_id === currentUserId) {
+        if (pendingMsgId && normalizedMsg.sender_id === currentUserId) {
           return prev.map((m) =>
-            m.id === pendingMsgId
-              ? { ...normalized, isSending: false }
-              : m
+            m.id === pendingMsgId ? { ...normalizedMsg, isSending: false } : m
           );
         }
-
-        // Nếu không trùng, thêm mới (nếu chưa tồn tại)
-        if (prev.some((m) => m.id === normalized.id)) return prev;
-        return [...prev, normalized];
+        if (prev.some((m) => m.id === normalizedMsg.id)) return prev;
+        return [...prev, normalizedMsg];
       });
 
-      // Clear pending sau khi thay thế
-      if (normalized.sender_id === currentUserId) {
+      if (normalizedMsg.sender_id === currentUserId) {
         setPendingMsgId(null);
       }
     };
 
-    socket.on("receive_message", handleReceive);
+    socket.on("receive_message", handleReceiveMessage);
 
-    return () => {
-      socket.off("receive_message", handleReceive);
-    };
+    return () => socket.off("receive_message", handleReceiveMessage);
   }, [open, conversationId, pendingMsgId, currentUserId]);
 
   const handleSend = async () => {
@@ -130,28 +114,21 @@ export default function ChatWidget() {
       isSending: true,
     };
 
-    // Optimistic UI: thêm tin nhắn tạm
     setMessages((prev) => [...prev, optimisticMsg]);
-    setPendingMsgId(tempId); // Track id tạm
-    setInput(""); // Clear input ngay
+    setPendingMsgId(tempId);
+    setInput("");
 
     try {
-      await sendMessage({
-        conversationId,
-        content: trimmed,
-      });
-      // Backend sẽ emit socket → handleReceive sẽ thay thế
+      await sendMessage({ conversationId, content: trimmed });
     } catch (err) {
       console.error("Gửi tin nhắn thất bại:", err);
-      // Xử lý lỗi: xóa optimistic hoặc đánh dấu lỗi
       setMessages((prev) => prev.filter((m) => m.id !== tempId));
-      setInput(trimmed); // Restore input nếu lỗi
+      setInput(trimmed);
     } finally {
       setSending(false);
     }
   };
 
-  // Focus input khi mở chat
   useEffect(() => {
     if (open && inputRef.current) {
       inputRef.current.focus();
@@ -160,24 +137,36 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Nút mở chat - giống Messenger */}
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => setOpen(!open)}
         className="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 to-blue-500 text-white flex items-center justify-center shadow-xl hover:scale-105 transition-transform duration-200"
+        aria-label="Mở chat hỗ trợ"
       >
         <MessageCircle size={28} />
       </button>
 
-      {/* Chat window */}
       {open && (
         <div
-          className="fixed bottom-24 right-6 z-50 w-96 h-[520px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 font-futura-regular"
-          style={{ maxHeight: "calc(100vh - 120px)" }}
+          className={`
+            fixed z-50 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden
+            border border-gray-200 font-futura-regular transition-all duration-300
+            
+            /* Desktop mặc định */
+            bottom-24 right-6 w-90 h-100
+            
+            /* Tablet & Mobile lớn (≥ 768px) */
+            md:bottom-6 md:right-6 md:w-[65%] md:h-[70vh] md:max-w-lg md:rounded-2xl
+            
+            /* Mobile nhỏ (< 768px) - full bottom, chiếm ~70% width */
+            bottom-0 right-0 w-[85%] max-w-[95vw] h-[68vh] rounded-t-2xl rounded-b-none
+            
+            max-h-[calc(100vh-8px)]
+          `}
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 flex items-center justify-between">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold">
+              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold text-lg">
                 CS
               </div>
               <div>
@@ -187,9 +176,10 @@ export default function ChatWidget() {
             </div>
             <button
               onClick={() => setOpen(false)}
-              className="p-1 hover:bg-white/20 rounded-full transition-colors"
+              className="p-1.5 hover:bg-white/20 rounded-full transition-colors"
+              aria-label="Đóng chat"
             >
-              <X size={22} />
+              <X size={24} />
             </button>
           </div>
 
@@ -198,51 +188,41 @@ export default function ChatWidget() {
             {messages.map((msg) => {
               const isMe = msg.sender_id === currentUserId;
               const time = msg.createdAt
-                ? msg.createdAt.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
+                ? msg.createdAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
                 : "";
 
               return (
-                <div
-                  key={msg.id}
-                  className={`flex ${isMe ? "justify-end" : "justify-start"} group`}
-                >
-<div
-  className={`max-w-[75%] px-4 py-2.5 rounded-2xl shadow-sm relative
-    break-words whitespace-pre-wrap
-    ${
-      isMe
-        ? "bg-blue-600 text-white rounded-br-none"
-        : "bg-white text-gray-900 rounded-bl-none border"
-    }`}
->
-  {msg.content}
-
-  {msg.isSending && (
-    <Loader2
-      size={14}
-      className="absolute -bottom-1 -right-1 text-white animate-spin"
-    />
-  )}
-
-  <span
-    className={`text-xs mt-1 block opacity-70 text-right
-      ${isMe ? "text-blue-100" : "text-gray-500"}`}
-  >
-    {time}
-  </span>
-</div>
-
+                <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"} group`}>
+                  <div
+                    className={`
+                      max-w-[80%] px-4 py-2.5 rounded-2xl shadow-sm relative break-words whitespace-pre-wrap
+                      ${
+                        isMe
+                          ? "bg-blue-600 text-white rounded-br-none"
+                          : "bg-white text-gray-900 rounded-bl-none border border-gray-200"
+                      }
+                    `}
+                  >
+                    {msg.content}
+                    {msg.isSending && (
+                      <Loader2 size={14} className="absolute -bottom-1 -right-1 text-white animate-spin" />
+                    )}
+                    <span
+                      className={`text-xs mt-1 block opacity-70 text-right ${
+                        isMe ? "text-blue-100" : "text-gray-500"
+                      }`}
+                    >
+                      {time}
+                    </span>
+                  </div>
                 </div>
               );
             })}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input area */}
-          <div className="p-3 bg-white border-t flex items-center gap-2">
+          {/* Input */}
+          <div className="p-3 bg-white border-t flex items-center gap-2 shrink-0">
             <input
               ref={inputRef}
               value={input}
@@ -253,26 +233,24 @@ export default function ChatWidget() {
                   handleSend();
                 }
               }}
-              placeholder="Aa"
+              placeholder="Aa..."
               className="flex-1 bg-gray-100 rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
               disabled={sending}
             />
             <button
-              type="button"
               onClick={handleSend}
               disabled={sending || !input.trim()}
-              className={`p-3 rounded-full transition-all duration-200
+              className={`
+                p-3 rounded-full transition-all duration-200
                 ${
                   sending || !input.trim()
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700 active:scale-95"
-                }`}
+                }
+              `}
+              aria-label="Gửi tin nhắn"
             >
-              {sending ? (
-                <Loader2 size={20} className="animate-spin" />
-              ) : (
-                <Send size={20} />
-              )}
+              {sending ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
             </button>
           </div>
         </div>

@@ -137,11 +137,6 @@ function Sidebar({ onCollapseChange }) {
           {!collapsed && (
             <div className="flex items-center justify-between w-full">
               <span>Tin nhắn</span>
-
-              {/* Badge unread (mock) */}
-              <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                3
-              </span>
             </div>
           )}
         </Link>
