@@ -7,6 +7,7 @@ import {
   sendMessage,
 } from "../../services/chat.service";
 import { socket } from "../../../socket/chat.socket";
+import Linkify from "linkify-react";
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
@@ -31,6 +32,12 @@ export default function ChatWidget() {
 
   const currentUserId = currentUser?.id;
   const currentUserRole = currentUser?.role;
+
+  const linkifyOptions = {
+    target: "_blank",
+    rel: "noopener noreferrer",
+    className: "text-blue-300 underline break-all hover:text-blue-400"
+  };
 
   if (currentUserRole === "admin") return null;
 
@@ -196,21 +203,21 @@ export default function ChatWidget() {
                   <div
                     className={`
                       max-w-[80%] px-4 py-2.5 rounded-2xl shadow-sm relative break-words whitespace-pre-wrap
-                      ${
-                        isMe
-                          ? "bg-blue-600 text-white rounded-br-none"
-                          : "bg-white text-gray-900 rounded-bl-none border border-gray-200"
+                      ${isMe
+                        ? "bg-blue-600 text-white rounded-br-none"
+                        : "bg-white text-gray-900 rounded-bl-none border border-gray-200"
                       }
                     `}
                   >
-                    {msg.content}
+                    <Linkify options={linkifyOptions}>
+                      {msg.content}
+                    </Linkify>
                     {msg.isSending && (
                       <Loader2 size={14} className="absolute -bottom-1 -right-1 text-white animate-spin" />
                     )}
                     <span
-                      className={`text-xs mt-1 block opacity-70 text-right ${
-                        isMe ? "text-blue-100" : "text-gray-500"
-                      }`}
+                      className={`text-xs mt-1 block opacity-70 text-right ${isMe ? "text-blue-100" : "text-gray-500"
+                        }`}
                     >
                       {time}
                     </span>
@@ -242,10 +249,9 @@ export default function ChatWidget() {
               disabled={sending || !input.trim()}
               className={`
                 p-3 rounded-full transition-all duration-200
-                ${
-                  sending || !input.trim()
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 active:scale-95"
+                ${sending || !input.trim()
+                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700 active:scale-95"
                 }
               `}
               aria-label="Gửi tin nhắn"
