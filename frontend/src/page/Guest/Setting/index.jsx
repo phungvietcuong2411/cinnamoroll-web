@@ -296,7 +296,7 @@ function Settings() {
         </div>
       </div>
 
-      <Footer />
+      
     </>
   )
 }

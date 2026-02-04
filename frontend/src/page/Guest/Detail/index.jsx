@@ -154,7 +154,7 @@ function Detail() {
         <div className="h-16" />
         {loading && <LoadingOverlay />}
         <div className="h-screen" />
-        <Footer />
+        
       </>
     )
   }
@@ -314,7 +314,7 @@ function Detail() {
         </div>
       </div>
 
-      <Footer />
+      
     </>
   )
 }

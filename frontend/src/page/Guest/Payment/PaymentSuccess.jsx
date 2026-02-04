@@ -50,7 +50,7 @@ function PaymentSuccess() {
                 </div>
             </div>
 
-            <Footer />
+            
         </>
     )
 }

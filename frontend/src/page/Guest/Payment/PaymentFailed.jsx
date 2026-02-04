@@ -50,7 +50,7 @@ function PaymentFailed() {
                 </div>
             </div>
 
-            <Footer />
+            
         </>
     )
 }

@@ -11,7 +11,6 @@ function Home() {
             <div className="h-16"></div>
             <Introduce />
             <More />
-            <Footer />
         </>
     )
 }

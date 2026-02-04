@@ -289,7 +289,7 @@ function Checkout() {
         </form>
       </div>
 
-      <Footer />
+      
     </>
   )
 }

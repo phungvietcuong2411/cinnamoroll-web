@@ -97,7 +97,7 @@ function Cart() {
         <div className="h-32 flex items-center justify-center font-futura-regular text-xl">
           Đang tải giỏ hàng...
         </div>
-        <Footer />
+        
       </>
     )
   }
@@ -320,7 +320,7 @@ function Cart() {
         </div>
       )}
 
-      <Footer />
+      
     </>
   )
 }

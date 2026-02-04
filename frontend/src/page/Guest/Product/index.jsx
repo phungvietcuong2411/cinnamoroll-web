@@ -439,7 +439,7 @@ function Product() {
         )}
       </div>
 
-      <Footer />
+      
     </>
   )
 }

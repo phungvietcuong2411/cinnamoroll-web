@@ -307,7 +307,7 @@ function Order() {
         </div>
       )}
 
-      <Footer />
+      
     </>
   )
 }
